@@ -25,6 +25,7 @@ class Gohar_e_Hikmat_Register {
     const member_page_shortcode       = 'gohar_e_hikmat_member';
     const lost_password               = 'gohar_e_hikmat_lost_password';
     const reset_password              = 'gohar_e_hikmat_reset_form';
+    const single_page                 = 'gohar_e_hikmat_single_page';
 
     /**
      * Initializes the plugin.
@@ -37,6 +38,8 @@ class Gohar_e_Hikmat_Register {
         add_shortcode( Gohar_e_Hikmat_Register::register_form_shortcode, array( $this, 'render_register_form' ) );
         add_shortcode( Gohar_e_Hikmat_Register::lost_password, array( $this, 'render_password_lost_form' ) );
         add_shortcode( Gohar_e_Hikmat_Register::reset_password, array( $this, 'render_password_reset_form' ) );
+        add_shortcode( Gohar_e_Hikmat_Register::member_page_shortcode, array( $this, 'render_member_page' ) );
+        add_shortcode( Gohar_e_Hikmat_Register::single_page, array( $this, 'render_single_page' ) );
 
 
 
@@ -58,9 +61,96 @@ class Gohar_e_Hikmat_Register {
         add_filter( 'authenticate', array( $this, 'maybe_redirect_at_authenticate' ), 101, 3 );
         add_filter( 'login_redirect', array( $this, 'redirect_after_login' ), 10, 3 );
         add_filter( 'retrieve_password_message', array( $this, 'replace_retrieve_password_message' ), 10, 4 );
+       
 
 
 
+    }
+
+    public function render_single_page()
+    {
+        if(isset($_POST['submit']))
+        {
+            $questions = get_post_meta($_POST['id'],'gohar_e_hikmat_questions',true);
+            $submitted = $_POST['option'];
+            
+            die;
+        }
+        if(isset($_GET['question_id']) && '' != ($_GET['question_id']))
+        {
+            $args = [
+                "posts__in" => [$_GET['question_id']],
+                "post_type" => "question"
+            ];
+            $query = new WP_Query($args);
+
+            if($query->have_posts())
+            {
+                ?>
+                <form action="" method="post">
+                <?php
+                while($query->have_posts()){
+                    $query->the_post();
+                    $id = get_the_ID();
+                    $questions = get_post_meta($id,'gohar_e_hikmat_questions',true);
+                    $pdf       = get_post_meta($id,'gohar_e_hikmat_pdf');
+                    
+                    foreach($questions as $index => $question){
+                        $_TMP = [];
+                        $_TMP = array_merge($question["option"],[$question["correct_answer"]]);
+                        shuffle($_TMP);
+                
+                        ?>
+                        <h1><?php echo $question["title"];?></h1>
+                        
+                        <input type="hidden" name="post_id" value="<?php echo $id;?>">
+                        <input type="hidden" name="question_id" value="<?php echo $index;?>">
+                        <?php foreach($_TMP as $opt)
+                        {
+                            ?>
+                            <input type="radio" name="option[<?php echo $index;?>]" value="<?php echo $opt;?>">
+                            <?php echo $opt;?>
+                            <?php
+
+                        }
+                        ?>
+                        <?php
+
+                          
+
+                    }
+                }
+                wp_reset_postdata();
+                ?>
+                <input type="submit" value="Submit" name="submit">
+                </form>
+                <?php
+            }
+            die;
+            return $_GET['question_id'];
+        }
+        return '';
+    }
+     
+    public function render_member_page()
+    {
+        $args = [
+            "post_type" =>"question"
+        ];
+        $query = new WP_Query($args);
+        var_dump($query->have_posts());
+        if($query->have_posts()){
+            while($query->have_posts())
+            {
+                $query->the_post();
+                ?>
+                <a href="<?php echo home_url( '/single-page/' ).'?question_id='.get_the_ID();?>"><?php echo get_the_title(); ?></a>
+                <?php
+            }
+            wp_reset_postdata();
+        }
+
+        return 'asdf';
     }
     /**
     * Resets the user's password if the password reset form was submitted.
@@ -325,8 +415,19 @@ class Gohar_e_Hikmat_Register {
                 $email = $_POST['email'];
                 $first_name = sanitize_text_field( $_POST['first_name'] );
                 $last_name = sanitize_text_field( $_POST['last_name'] );
+                $country_id = sanitize_text_field( $_POST['country_id'] );
+                $login_name = sanitize_text_field( $_POST['login_name'] );
+                $date_of_birth = sanitize_text_field( $_POST['date_of_birth'] );
+                $nic_passport = sanitize_text_field( $_POST['nic_passport'] );
+                $street_address = sanitize_text_field( $_POST['street_address'] );
+                $telephone = sanitize_text_field( $_POST['telephone'] );
              
-                $result = $this->register_user( $email, $first_name, $last_name );
+                $result = $this->register_user( $email, $first_name, $last_name,$country_id,
+                $login_name,
+                 $date_of_birth,
+                $nic_passport,
+                 $street_address,
+                                  $telephone );
              
                 if ( is_wp_error( $result ) ) {
                     // Parse errors into a string and append as parameter to redirect
@@ -352,7 +453,12 @@ class Gohar_e_Hikmat_Register {
      *
      * @return int|WP_Error         The id of the user that was created, or error if failed.
      */
-    private function register_user( $email, $first_name, $last_name ) {
+    private function register_user( $email, $first_name, $last_name,
+    $country_id,
+$login_name, $date_of_birth,
+$nic_passport,
+ $street_address,
+ $telephone ) {
         $errors = new WP_Error();
     
         // Email address is used as both username and email. It is also the only
@@ -366,22 +472,31 @@ class Gohar_e_Hikmat_Register {
             $errors->add( 'email_exists', $this->get_error_message( 'email_exists') );
             return $errors;
         }
+         if ( username_exists( $login_name ) ) {
+            $errors->add( 'username_exists', $this->get_error_message( 'username_exists') );
+            return $errors;
+        }
     
         // Generate the password so that the subscriber will have to check email...
         $password = wp_generate_password( 12, false );
     
         $user_data = array(
-            'user_login'    => $email,
+            'user_login'    => $login_name,
+            'user_nicename'    => $login_name,
             'user_email'    => $email,
             'user_pass'     => $password,
             'first_name'    => $first_name,
             'last_name'     => $last_name,
-            'nickname'      => $first_name,
+            'nickname'      => $login_name,
         );
     
         $user_id = wp_insert_user( $user_data );
         wp_new_user_notification( $user_id, $password );
-    
+        add_user_meta($user_id,'date_of_birth',$date_of_birth);
+        add_user_meta($user_id,'nic_passport',$nic_passport);
+         add_user_meta($user_id,'street_address',$street_address);
+         add_user_meta($user_id,'telephone',$telephone);
+         add_user_meta($user_id,'country_id',$country_id);
         return $user_id;
     }
 
@@ -417,11 +532,12 @@ class Gohar_e_Hikmat_Register {
         // Check if the user just registered
         $attributes['registered'] = isset( $_REQUEST['registered'] );
         // Retrieve recaptcha key
-        $attributes['recaptcha_site_key'] = get_option( 'personalize-login-recaptcha-site-key', null );
+    
         // Parse shortcode attributes
         $default_attributes = array( 'show_title' => false );
+        
         $attributes = shortcode_atts( $default_attributes, $attributes );
-    
+        $attributes['recaptcha_site_key'] = get_option( 'personalize-login-recaptcha-site-key', null );
         if ( is_user_logged_in() ) {
             return __( 'You are already signed in.', 'personalize-login' );
         } elseif ( ! get_option( 'users_can_register' ) ) {
@@ -593,6 +709,9 @@ class Gohar_e_Hikmat_Register {
                     
             case 'password_reset_empty':
                 return __( "Sorry, we don't accept empty passwords.", 'personalize-login' );
+            case 'username_exists':
+                return __( "Username already exists.", 'personalize-login' );
+                
             default:
                 break;
         }
@@ -743,6 +862,10 @@ class Gohar_e_Hikmat_Register {
             'member-password-reset' => array(
                 'title' => __( 'Pick a New Password', 'personalize-login' ),
                 'content' => '['.Gohar_e_Hikmat_Register::reset_password.']' //custom-password-reset-form
+            ),
+            'single-page' => array(
+                'title' => __( 'Single Question Page', 'personalize-login' ),
+                'content' => '['.Gohar_e_Hikmat_Register::single_page.']' //custom-password-reset-form
             )
         );
     
