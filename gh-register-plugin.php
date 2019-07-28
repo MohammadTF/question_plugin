@@ -73,8 +73,7 @@ class Gohar_e_Hikmat_Register {
         {
             $questions = get_post_meta($_POST['id'],'gohar_e_hikmat_questions',true);
             $submitted = $_POST['option'];
-            
-            die;
+                       
         }
         if(isset($_GET['question_id']) && '' != ($_GET['question_id']))
         {
@@ -126,7 +125,7 @@ class Gohar_e_Hikmat_Register {
                 </form>
                 <?php
             }
-            die;
+            
             return $_GET['question_id'];
         }
         return '';

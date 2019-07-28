@@ -7,7 +7,11 @@ class Gohar_e_Hikmat_Questions{
         add_action( 'init', array($this,'codex_question_init') );
         add_action( 'admin_menu', array($this,'rudr_add_a_metabox') );
         add_action( 'save_post', array($this,'rudr_save_post_meta'), 10, 2 );
+        add_action('post_edit_form_tag', array($this,'add_post_enctype'));
+    }
 
+    function add_post_enctype() {
+        echo ' enctype="multipart/form-data"';
     }
 
     /**
@@ -63,28 +67,29 @@ class Gohar_e_Hikmat_Questions{
         );
     }
     function rudr_save_post_meta( $post_id, $post ) {
-        
         /* 
-         * Security checks
-         */
+        * Security checks
+        */
+        
         if ( !isset( $_POST['rudr_metabox_nonce'] ) 
         || !wp_verify_nonce( $_POST['rudr_metabox_nonce'], 'gh_question_save' ) )
-            return $post_id;
+        return $post_id;
         /* 
-         * Check current user permissions
-         */
+        * Check current user permissions
+        */
+       
         $post_type = get_post_type_object( $post->post_type );
         if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
-            return $post_id;
+        return $post_id;
         /*
-         * Do not save the data if autosave
-         */
+        * Do not save the data if autosave
+        */
         if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) 
-            return $post_id;
+        return $post_id;
         
+        
+        if ($post->post_type == 'question') { // define your own post type here
             
-            if ($post->post_type == 'question') { // define your own post type here
-              
             update_post_meta($post_id, 'gohar_e_hikmat_questions',  $_POST['gh_question']  );
             
             if( ! empty( $_FILES ) && isset( $_FILES['gh_pdf'] ) ) {
