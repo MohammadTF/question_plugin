@@ -87,14 +87,17 @@ class Gohar_e_Hikmat_Questions{
         if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) 
         return $post_id;
         
-        
         if ($post->post_type == 'question') { // define your own post type here
             
             update_post_meta($post_id, 'gohar_e_hikmat_questions',  $_POST['gh_question']  );
             
             if( ! empty( $_FILES ) && isset( $_FILES['gh_pdf'] ) ) {
-            // Upload the goal image to the uploads directory, resize the image, then upload the resized version
-				$goal_image_file = wp_upload_bits( $_FILES['gh_pdf']['name'], null, wp_remote_get( $_FILES['gh_pdf']['tmp_name'] ) );
+                // Upload the goal image to the uploads directory, resize the image, then upload the resized version
+                // print_r($_FILES['gh_pdf'] );
+                // var_dump(@file_get_contents( $_FILES['gh_pdf']['tmp_name']));
+                // var_dump(! empty( $_FILES ) && isset( $_FILES['gh_pdf'] ));
+                // var_dump($post->post_type );die();
+				$goal_image_file = wp_upload_bits( $_FILES['gh_pdf']['name'], null, @file_get_contents( $_FILES['gh_pdf']['tmp_name'] ) );
 
 				if( false == $goal_image_file['error'] ) {
 				
