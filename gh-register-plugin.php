@@ -71,22 +71,55 @@ class Gohar_e_Hikmat_Register {
     {
         if(isset($_POST['submit']))
         {
-            $questions = get_post_meta($_POST['id'],'gohar_e_hikmat_questions',true);
+            $questions = get_post_meta($_POST['post_id'],'gohar_e_hikmat_questions',true);
             $submitted = $_POST['option'];
+            $correct_answers = [];
+
+            foreach($submitted as $ques => $ans)
+            {
+                foreach($questions as  $question_data)
+                {
+                    $_TMP = $ans;
+                    $_TMP = array_values($_TMP);
+                    $_TMP = isset($_TMP[0])?$_TMP[0]:'';
+                    if($ques === $question_data['title'] && $_TMP === $question_data['correct_answer'] )
+                    {
+                        $correct_answers[]   = [
+                            'question'=>$question_data['title'],
+                            'answer'=>$question_data['correct_answer']
+                        ];
+                    }
+                }
+            }
+
+            if(is_user_logged_in()){
+                $user_id = get_current_user_id();
+
+                update_user_meta($user_id,'_given_answers',$_POST['post_id']);
+                update_user_meta($user_id,'_question_'.$_POST['post_id'],json_encode($correct_answers));
+
+                update_post_meta($_POST['post_id'],'user_answer',$user_id); 
+            }
                        
         }
         if(isset($_GET['question_id']) && '' != ($_GET['question_id']))
         {
+            $question_id = trim($_GET['question_id']);
+            $link = get_post_meta($question_id, 'gohar_e_hikmat_pdf',true);
             $args = [
                 "posts__in" => [$_GET['question_id']],
                 "post_type" => "question"
             ];
             $query = new WP_Query($args);
-
+            ob_start();
+    
             if($query->have_posts())
             {
                 ?>
                 <form action="" method="post">
+                <?php if($link): ?>
+                <a href="<?php echo $link;?>" target="_blank">Open Book</a>
+                <?php endif; ?>
                 <?php
                 while($query->have_posts()){
                     $query->the_post();
@@ -107,7 +140,7 @@ class Gohar_e_Hikmat_Register {
                         <?php foreach($_TMP as $opt)
                         {
                             ?>
-                            <input type="radio" name="option[<?php echo $index;?>]" value="<?php echo $opt;?>">
+                            <input type="radio" name="option[<?php echo $question['title'];?>][<?php echo $index;?>]" value="<?php echo $opt;?>">
                             <?php echo $opt;?>
                             <?php
 
@@ -126,9 +159,12 @@ class Gohar_e_Hikmat_Register {
                 <?php
             }
             
-            return $_GET['question_id'];
+            // return $_GET['question_id'];
         }
-        return '';
+        $html = ob_get_contents();
+        ob_end_clean();
+    
+        return $html;
     }
      
     public function render_member_page()
@@ -136,8 +172,10 @@ class Gohar_e_Hikmat_Register {
         $args = [
             "post_type" =>"question"
         ];
+        ob_start();
+    
+        
         $query = new WP_Query($args);
-        var_dump($query->have_posts());
         if($query->have_posts()){
             while($query->have_posts())
             {
@@ -149,7 +187,10 @@ class Gohar_e_Hikmat_Register {
             wp_reset_postdata();
         }
 
-        return 'asdf';
+        $html = ob_get_contents();
+        ob_end_clean();
+    
+        return $html;
     }
     /**
     * Resets the user's password if the password reset form was submitted.
