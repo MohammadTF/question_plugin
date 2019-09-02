@@ -1,10 +1,3 @@
-<div hidden>
-<p><label>SEO title <input type="text" name="gh_question_title"
- value="<?php echo esc_attr( get_post_meta($post->ID, 'gh_question_title',true) );?>" /></label></p>
-<p><label><input type="checkbox" name="gh_question_noindex" 
-<?php echo checked( get_post_meta($post->ID, 'gh_question_noindex',true), 'on', false ); ?>
-         /> Turn off page visibility for search engines</label></p>
-</div>
 
 <?php
 /*
