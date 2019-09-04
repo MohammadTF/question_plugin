@@ -1,11 +1,13 @@
 
 <?php
-    /*
+/*
 	 * needed for security reasons
 	 */
     wp_nonce_field( 'gh_question_save', 'rudr_metabox_nonce' );
     $data = get_post_meta($post->ID, 'gohar_e_hikmat_questions',true);
     $link = get_post_meta($post->ID, 'gohar_e_hikmat_pdf',true);
+    $release = get_post_meta($post->ID, 'gh_release',true);
+    $answer_display = get_post_meta($post->ID, 'gh_answer_display',true);
 ?>
 <div>
     <label for="gh_pdf">Upload PDF:</label>
@@ -13,6 +15,17 @@
     <?php if($link): ?>
     <a href="<?php echo $link;?>" target="_blank">View</a>
     <?php endif; ?>
+    <div>
+            <label for="release">Release Date:</label>
+            <input type="date" name="gh_release" value="<?php echo $release;?>" id="release">
+            
+        </div>
+
+        <div>
+            <label for="answer_display">Answer Display Date:</label>
+            <input type="date" name="gh_answer_display" value="<?php echo $answer_display;?>" id="answer_display">
+            
+        </div>
 
 </div>
 
@@ -22,17 +35,6 @@
         <div>
             <label for="question_1">Question:</label>
             <input type="text" name="gh_question[0][title]" value="" id="question_1">
-            
-        </div>
-        <div>
-            <label for="release_1">Release Date:</label>
-            <input type="date" name="gh_question[0][release]" value="" id="release_1">
-            
-        </div>
-
-        <div>
-            <label for="answer_display_1">Answer Display Date:</label>
-            <input type="date" name="gh_question[0][answer_display]" value="" id="answer_display_1">
             
         </div>
        
@@ -81,19 +83,6 @@ foreach($data as $d=>$v)
             <input type="text" name="gh_question[<?php echo $d;?>][title]" value="<?php echo $v['title']?>" id="question_<?php echo $index;?>">
             
         </div>
-
-        <div>
-            <label for="release_<?php echo $d;?>">Release Date:</label>
-            <input type="date" name="gh_question[<?php echo $d;?>][release]" value="<?php echo $v['release']?>" id="release_<?php echo $d;?>">
-            
-        </div>
-
-        <div>
-            <label for="answer_display_<?php echo $d;?>">Answer Display Date:</label>
-            <input type="date" name="gh_question[<?php echo $d;?>][answer_display]" value="<?php echo $v['answer_display']?>" id="answer_display_<?php echo $d;?>">
-            
-        </div>
-       
        
         <div>
             <label for="correct_answer_<?php echo $index;?>">Correct Answer:</label>
