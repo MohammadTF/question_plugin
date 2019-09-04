@@ -21,20 +21,20 @@ class Gohar_e_Hikmat_Questions{
      */
     function codex_question_init() {
         $labels = array(
-            'name'               => _x( 'Questions', 'post type general name', 'your-plugin-textdomain' ),
-            'singular_name'      => _x( 'Question', 'post type singular name', 'your-plugin-textdomain' ),
-            'menu_name'          => _x( 'Questions', 'admin menu', 'your-plugin-textdomain' ),
-            'name_admin_bar'     => _x( 'Question', 'add new on admin bar', 'your-plugin-textdomain' ),
-            'add_new'            => _x( 'Add New', 'question', 'your-plugin-textdomain' ),
-            'add_new_item'       => __( 'Add New question', 'your-plugin-textdomain' ),
-            'new_item'           => __( 'New question', 'your-plugin-textdomain' ),
-            'edit_item'          => __( 'Edit question', 'your-plugin-textdomain' ),
-            'view_item'          => __( 'View question', 'your-plugin-textdomain' ),
-            'all_items'          => __( 'All questions', 'your-plugin-textdomain' ),
-            'search_items'       => __( 'Search questions', 'your-plugin-textdomain' ),
-            'parent_item_colon'  => __( 'Parent questions:', 'your-plugin-textdomain' ),
-            'not_found'          => __( 'No questions found.', 'your-plugin-textdomain' ),
-            'not_found_in_trash' => __( 'No questions found in Trash.', 'your-plugin-textdomain' )
+            'name'               => _x( 'Topic', 'post type general name', 'your-plugin-textdomain' ),
+            'singular_name'      => _x( 'Topic', 'post type singular name', 'your-plugin-textdomain' ),
+            'menu_name'          => _x( 'Gohar e Hikmat', 'admin menu', 'your-plugin-textdomain' ),
+            'name_admin_bar'     => _x( 'Gohar e Hikmat', 'add new on admin bar', 'your-plugin-textdomain' ),
+            'add_new'            => _x( 'Add New', 'gohar_e_hikmat', 'your-plugin-textdomain' ),
+            'add_new_item'       => __( 'Add New Topic', 'your-plugin-textdomain' ),
+            'new_item'           => __( 'New Topic', 'your-plugin-textdomain' ),
+            'edit_item'          => __( 'Edit Topic', 'your-plugin-textdomain' ),
+            'view_item'          => __( 'View Topic', 'your-plugin-textdomain' ),
+            'all_items'          => __( 'All Topic', 'your-plugin-textdomain' ),
+            'search_items'       => __( 'Search Topic', 'your-plugin-textdomain' ),
+            'parent_item_colon'  => __( 'Parent Topic:', 'your-plugin-textdomain' ),
+            'not_found'          => __( 'No Topic found.', 'your-plugin-textdomain' ),
+            'not_found_in_trash' => __( 'No Topic found in Trash.', 'your-plugin-textdomain' )
         );
 
         $args = array(
@@ -45,7 +45,7 @@ class Gohar_e_Hikmat_Questions{
             'show_ui'            => true,
             'show_in_menu'       => true,
             'query_var'          => true,
-            'rewrite'            => array( 'slug' => 'question' ),
+            'rewrite'            => array( 'slug' => 'gohar_e_hikmat' ),
             'capability_type'    => 'post',
             'has_archive'        => true,
             'hierarchical'       => false,
@@ -53,7 +53,7 @@ class Gohar_e_Hikmat_Questions{
             'supports'           => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments' )
         );
 
-        register_post_type( 'question', $args );
+        register_post_type( 'gohar_e_hikmat', $args );
     }
 
     function rudr_add_a_metabox() {
@@ -61,7 +61,7 @@ class Gohar_e_Hikmat_Questions{
             'gohar_e_hikmat_question_box', // metabox ID, it also will be the HTML id attribute
             'Questions', // title
             array($this,'question_display_metabox'), // this is a callback function, which will print HTML of our metabox
-            'question', // post type or post types in array
+            'gohar_e_hikmat', // post type or post types in array
             'normal', // position on the screen where metabox should be displayed (normal, side, advanced)
             'default' // priority over another metaboxes on this page (default, low, high, core)
         );
@@ -87,7 +87,7 @@ class Gohar_e_Hikmat_Questions{
         if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) 
         return $post_id;
         
-        if ($post->post_type == 'question') { // define your own post type here
+        if ($post->post_type == 'gohar_e_hikmat') { // define your own post type here
             
             update_post_meta($post_id, 'gohar_e_hikmat_questions',  $_POST['gh_question']  );
             

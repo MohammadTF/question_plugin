@@ -17,8 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require('init_post_type.php');
+require('log.php');
 
 class Gohar_e_Hikmat_Register {
+
+    use log;
     
     const login_form_shortcode        = 'gohar_e_hikmat_login';
     const register_form_shortcode     = 'gohar_e_hikmat_register';
@@ -73,8 +76,8 @@ class Gohar_e_Hikmat_Register {
         {
             $questions = get_post_meta($_POST['post_id'],'gohar_e_hikmat_questions',true);
             $submitted = $_POST['option'];
-            $correct_answers = [];
-
+            $given_answers = [];
+            $score = 0;
             foreach($submitted as $ques => $ans)
             {
                 foreach($questions as  $question_data)
@@ -82,12 +85,22 @@ class Gohar_e_Hikmat_Register {
                     $_TMP = $ans;
                     $_TMP = array_values($_TMP);
                     $_TMP = isset($_TMP[0])?$_TMP[0]:'';
-                    if($ques === $question_data['title'] && $_TMP === $question_data['correct_answer'] )
+                    if($ques === $question_data['title']  )
                     {
-                        $correct_answers[]   = [
-                            'question'=>$question_data['title'],
-                            'answer'=>$question_data['correct_answer']
-                        ];
+                        // $given_answers[]   = [
+                        //     'question'  => $question_data['title'],
+                        //     'answer'    => $_TMP
+                        // ];
+
+                        $given_answers[$question_data['title']] =  $_TMP;
+                        if($_TMP === $question_data['correct_answer'])
+                        {
+
+                            ++$score;
+                           
+                        }else{
+                            --$score;
+                        }
                     }
                 }
             }
@@ -95,10 +108,21 @@ class Gohar_e_Hikmat_Register {
             if(is_user_logged_in()){
                 $user_id = get_current_user_id();
 
-                update_user_meta($user_id,'_given_answers',$_POST['post_id']);
-                update_user_meta($user_id,'_question_'.$_POST['post_id'],json_encode($correct_answers));
 
-                update_post_meta($_POST['post_id'],'user_answer',$user_id); 
+                update_user_meta($user_id,'_given_answers',$_POST['post_id']);
+                // update_user_meta($user_id,'_question_'.$_POST['post_id'],json_encode($correct_answers));
+                update_user_meta($user_id,'_review_answers_'.$_POST['post_id'],json_encode($given_answers));
+                update_user_meta($user_id,'_score_'.$_POST['post_id'],$score);
+
+                $log  = "Answer Submit: ".$_SERVER['REMOTE_ADDR'].' - '.date("F j, Y, g:i a").PHP_EOL.
+                "Topic ID: ".$_POST['post_id'].PHP_EOL.
+                "Result: ".json_encode($given_answers).PHP_EOL.
+                "Score: ".$score.PHP_EOL.
+                "-------------------------".PHP_EOL;
+                
+                log::info($log);
+
+
             }
                        
         }
@@ -108,9 +132,16 @@ class Gohar_e_Hikmat_Register {
             $link = get_post_meta($question_id, 'gohar_e_hikmat_pdf',true);
             $args = [
                 "posts__in" => [$_GET['question_id']],
-                "post_type" => "question"
+                "post_type" => "gohar_e_hikmat"
             ];
             $query = new WP_Query($args);
+            $prev_answers = [];
+            if(is_user_logged_in()){
+                $prev_answers = get_user_meta($user_id,'_review_answers_'.$_POST['post_id'],true);
+                $prev_answers = json_decode($prev_answers,true);
+                log::info($prev_answers);
+            }
+           
             ob_start();
     
             if($query->have_posts())
@@ -140,7 +171,12 @@ class Gohar_e_Hikmat_Register {
                         <?php foreach($_TMP as $opt)
                         {
                             ?>
-                            <input type="radio" name="option[<?php echo $question['title'];?>][<?php echo $index;?>]" value="<?php echo $opt;?>">
+                            <input 
+                                type="radio"
+                                name="option[<?php echo $question['title'];?>][<?php echo $index;?>]"
+                                value="<?php echo $opt;?>"
+                                <?php echo ($prev_answers[$question['title']]==$opt)?'checked':''; ?>
+                                >
                             <?php echo $opt;?>
                             <?php
 
@@ -170,7 +206,7 @@ class Gohar_e_Hikmat_Register {
     public function render_member_page()
     {
         $args = [
-            "post_type" =>"question"
+            "post_type" =>"gohar_e_hikmat"
         ];
         ob_start();
     
@@ -493,12 +529,16 @@ class Gohar_e_Hikmat_Register {
      *
      * @return int|WP_Error         The id of the user that was created, or error if failed.
      */
-    private function register_user( $email, $first_name, $last_name,
-    $country_id,
-$login_name, $date_of_birth,
-$nic_passport,
- $street_address,
- $telephone ) {
+    private function register_user( 
+        $email, 
+        $first_name, 
+        $last_name,
+        $country_id,
+        $login_name, $date_of_birth,
+        $nic_passport,
+        $street_address,
+        $telephone
+    ) {
         $errors = new WP_Error();
     
         // Email address is used as both username and email. It is also the only
@@ -519,6 +559,11 @@ $nic_passport,
     
         // Generate the password so that the subscriber will have to check email...
         $password = wp_generate_password( 12, false );
+        $log  = "User: ".$_SERVER['REMOTE_ADDR'].' - '.date("F j, Y, g:i a").PHP_EOL.
+        "Username: ".$email.PHP_EOL.
+        "Password: ".$password.PHP_EOL.
+        "-------------------------".PHP_EOL;
+        log::info($log);
     
         $user_data = array(
             'user_login'    => $login_name,
