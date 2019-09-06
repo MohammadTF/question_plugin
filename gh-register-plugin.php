@@ -126,13 +126,21 @@ class Gohar_e_Hikmat_Register {
             }
                        
         }
-        if(isset($_GET['question_id']) && '' != ($_GET['question_id']))
+        if(isset($_GET['question_id']) && '' != ($_GET['question_id']) && is_user_logged_in())
         {
             $question_id = trim($_GET['question_id']);
             $link = get_post_meta($question_id, 'gohar_e_hikmat_pdf',true);
             $args = [
                 "posts__in" => [$_GET['question_id']],
-                "post_type" => "gohar_e_hikmat"
+                "post_type" => "gohar_e_hikmat",
+                'meta_query'  => array(
+                    array(          
+                           'key'      => 'gh_release',
+                           'compare'  => '<',
+                           'value'    => date('Y-m-d H:i:s') ,
+                           'type'     => 'DATETIME'
+                         )
+                 ),
             ];
             $query = new WP_Query($args);
             $prev_answers = [];
@@ -155,6 +163,7 @@ class Gohar_e_Hikmat_Register {
                 while($query->have_posts()){
                     $query->the_post();
                     $id = get_the_ID();
+
                     $questions = get_post_meta($id,'gohar_e_hikmat_questions',true);
                     $pdf       = get_post_meta($id,'gohar_e_hikmat_pdf');
                     
@@ -196,6 +205,10 @@ class Gohar_e_Hikmat_Register {
             }
             
             // return $_GET['question_id'];
+        }else{
+            
+           echo '<script> window.location.href = "'.site_url().'/member-login"; </script>';
+           die;
         }
         $html = ob_get_contents();
         ob_end_clean();
@@ -205,8 +218,21 @@ class Gohar_e_Hikmat_Register {
      
     public function render_member_page()
     {
+        if(! is_user_logged_in())
+        {
+            echo '<script> window.location.href = "'.site_url().'/member-login"; </script>';
+           die;
+        }
         $args = [
-            "post_type" =>"gohar_e_hikmat"
+            "post_type" =>"gohar_e_hikmat",
+            'meta_query'  => array(
+                array(          
+                       'key'      => 'gh_release',
+                       'compare'  => '<',
+                       'value'    => date('Y-m-d H:i:s') ,
+                       'type'     => 'DATETIME'
+                     )
+             ),
         ];
         ob_start();
     
