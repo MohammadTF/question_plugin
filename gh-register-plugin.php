@@ -65,9 +65,21 @@ class Gohar_e_Hikmat_Register {
         add_filter( 'login_redirect', array( $this, 'redirect_after_login' ), 10, 3 );
         add_filter( 'retrieve_password_message', array( $this, 'replace_retrieve_password_message' ), 10, 4 );
        
-
-
-
+        add_filter('manage_users_columns', array( $this,'pippin_add_user_id_column'));
+        add_action('manage_users_custom_column',  array( $this,'pippin_show_user_id_column_content'), 10, 3);
+        
+        
+    }
+    function pippin_add_user_id_column($columns) {
+        $columns['user_score'] = 'Score';
+        return $columns;
+    }
+        
+    function pippin_show_user_id_column_content($value, $column_name, $user_id) {
+        $user = get_userdata( $user_id );
+        if ( 'user_score' == $column_name )
+            return $user_id;
+        return $value;
     }
 
     public function render_single_page()
@@ -173,15 +185,14 @@ class Gohar_e_Hikmat_Register {
                     // var_dump([$id, $display_answer < $today,$display_answer , $today]);
                     $questions = get_post_meta($id,'gohar_e_hikmat_questions',true);
                     $pdf       = get_post_meta($id,'gohar_e_hikmat_pdf');
-                    if($display_answer < $today)
+                   
+                    echo 'Score: '.$score;
+                    if(!empty($prev_answers))
                     {
-                            if(!empty($prev_answers))
-                            {
-                                foreach($prev_answers as $q => $ans){
-                                    echo '<p>'.$q.' - '.$ans['given_answer']. ' - Correct answer -' .$ans['correct_answer'].'</p>';
-                                }
-                            }
-                            echo 'Score: '.$score;
+                        foreach($prev_answers as $q => $ans){
+                            echo '<p>'.$q.' - '.$ans['given_answer']. ' - Correct answer -' .$ans['correct_answer'].'</p>';
+                        }
+            
                        
                     }else{
                         foreach($questions as $index => $question){
