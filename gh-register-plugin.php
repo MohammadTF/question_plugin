@@ -163,7 +163,9 @@ class Gohar_e_Hikmat_Register {
                 while($query->have_posts()){
                     $query->the_post();
                     $id = get_the_ID();
-
+                    $display_answer = get_post_meta($id, 'gh_answer_display',true);
+                    $today = date('Y-m-d');
+                    // var_dump([$id, $display_answer, $today]);
                     $questions = get_post_meta($id,'gohar_e_hikmat_questions',true);
                     $pdf       = get_post_meta($id,'gohar_e_hikmat_pdf');
                     
@@ -174,7 +176,7 @@ class Gohar_e_Hikmat_Register {
                 
                         ?>
                         <h1><?php echo $question["title"];?></h1>
-                        
+                        <p><?php the_content(); ?></p>
                         <input type="hidden" name="post_id" value="<?php echo $id;?>">
                         <input type="hidden" name="question_id" value="<?php echo $index;?>">
                         <?php foreach($_TMP as $opt)
