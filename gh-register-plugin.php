@@ -87,12 +87,13 @@ class Gohar_e_Hikmat_Register {
                     $_TMP = isset($_TMP[0])?$_TMP[0]:'';
                     if($ques === $question_data['title']  )
                     {
-                        // $given_answers[]   = [
-                        //     'question'  => $question_data['title'],
-                        //     'answer'    => $_TMP
-                        // ];
+                        $given_answers[$question_data['title']]   = [
+                            'question'  => $question_data['title'],
+                            'given_answer'    => $_TMP,
+                            'correct_answer'    => $question_data['correct_answer']
+                        ];
 
-                        $given_answers[$question_data['title']] =  $_TMP;
+                        // $given_answers[$question_data['title']] =  $_TMP;
                         if($_TMP === $question_data['correct_answer'])
                         {
 
@@ -144,8 +145,12 @@ class Gohar_e_Hikmat_Register {
             ];
             $query = new WP_Query($args);
             $prev_answers = [];
+            $submitted_answers = [];
+            $score = 0;
             if(is_user_logged_in()){
-                $prev_answers = get_user_meta($user_id,'_review_answers_'.$_POST['post_id'],true);
+                $user_id        = get_current_user_id();
+                $prev_answers   = get_user_meta($user_id,'_review_answers_'.$_POST['post_id'],true);
+                $score          = get_user_meta($user_id,'_score_'.$_POST['post_id'],true);
                 $prev_answers = json_decode($prev_answers,true);
                 log::info($prev_answers);
             }
@@ -165,39 +170,51 @@ class Gohar_e_Hikmat_Register {
                     $id = get_the_ID();
                     $display_answer = get_post_meta($id, 'gh_answer_display',true);
                     $today = date('Y-m-d');
-                    // var_dump([$id, $display_answer, $today]);
+                    // var_dump([$id, $display_answer < $today,$display_answer , $today]);
                     $questions = get_post_meta($id,'gohar_e_hikmat_questions',true);
                     $pdf       = get_post_meta($id,'gohar_e_hikmat_pdf');
+                    if($display_answer < $today)
+                    {
+                            if(!empty($prev_answers))
+                            {
+                                foreach($prev_answers as $q => $ans){
+                                    echo '<p>'.$q.' - '.$ans['given_answer']. ' - Correct answer -' .$ans['correct_answer'].'</p>';
+                                }
+                            }
+                            echo 'Score: '.$score;
+                       
+                    }else{
+                        foreach($questions as $index => $question){
+                            $_TMP = [];
+                            $_TMP = array_merge($question["option"],[$question["correct_answer"]]);
+                            shuffle($_TMP);
                     
-                    foreach($questions as $index => $question){
-                        $_TMP = [];
-                        $_TMP = array_merge($question["option"],[$question["correct_answer"]]);
-                        shuffle($_TMP);
-                
-                        ?>
-                        <h1><?php echo $question["title"];?></h1>
-                        <p><?php the_content(); ?></p>
-                        <input type="hidden" name="post_id" value="<?php echo $id;?>">
-                        <input type="hidden" name="question_id" value="<?php echo $index;?>">
-                        <?php foreach($_TMP as $opt)
-                        {
                             ?>
-                            <input 
-                                type="radio"
-                                name="option[<?php echo $question['title'];?>][<?php echo $index;?>]"
-                                value="<?php echo $opt;?>"
-                                <?php echo ($prev_answers[$question['title']]==$opt)?'checked':''; ?>
-                                >
-                            <?php echo $opt;?>
+                            <h1><?php echo $question["title"];?></h1>
+                            <p><?php the_content(); ?></p>
+                            <input type="hidden" name="post_id" value="<?php echo $id;?>">
+                            <input type="hidden" name="question_id" value="<?php echo $index;?>">
+                            <?php foreach($_TMP as $opt)
+                            {
+                                ?>
+                                <input 
+                                    type="radio"
+                                    name="option[<?php echo $question['title'];?>][<?php echo $index;?>]"
+                                    value="<?php echo $opt;?>"
+                                    <?php echo ($prev_answers[$question['title']]['given_answer']==$opt)?'checked':''; ?>
+                                    >
+                                <?php echo $opt;?>
+                                <?php
+    
+                            }
+                            ?>
                             <?php
-
+    
+                              
+    
                         }
-                        ?>
-                        <?php
-
-                          
-
                     }
+                    
                 }
                 wp_reset_postdata();
                 ?>
