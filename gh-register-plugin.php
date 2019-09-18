@@ -141,103 +141,109 @@ class Gohar_e_Hikmat_Register {
         }
         if(isset($_GET['question_id']) && '' != ($_GET['question_id']) && is_user_logged_in())
         {
-            $question_id = trim($_GET['question_id']);
-            $link = get_post_meta($question_id, 'gohar_e_hikmat_pdf',true);
-            $args = [
-                "posts__in" => [$_GET['question_id']],
-                "post_type" => "gohar_e_hikmat",
-                'meta_query'  => array(
-                    array(          
-                           'key'      => 'gh_release',
-                           'compare'  => '<',
-                           'value'    => date('Y-m-d H:i:s') ,
-                           'type'     => 'DATETIME'
-                         )
-                 ),
-            ];
-            $query = new WP_Query($args);
-            $prev_answers = [];
-            $submitted_answers = [];
-            $score = 0;
-            if(is_user_logged_in()){
-                $user_id        = get_current_user_id();
-                $prev_answers   = get_user_meta($user_id,'_review_answers_'.$_POST['post_id'],true);
-                $score          = get_user_meta($user_id,'_score_'.$_POST['post_id'],true);
-                $prev_answers = json_decode($prev_answers,true);
-                log::info($prev_answers);
-            }
            
-            ob_start();
-    
-            if($query->have_posts())
-            {
-                ?>
-                <form action="" method="post">
-                <?php if($link): ?>
-                <a href="<?php echo $link;?>" target="_blank">Open Book</a>
-                <?php endif; ?>
-                <?php
-                while($query->have_posts()){
-                    $query->the_post();
-                    $id = get_the_ID();
-                    $display_answer = get_post_meta($id, 'gh_answer_display',true);
-                    $today = date('Y-m-d');
-                    // var_dump([$id, $display_answer < $today,$display_answer , $today]);
-                    $questions = get_post_meta($id,'gohar_e_hikmat_questions',true);
-                    $pdf       = get_post_meta($id,'gohar_e_hikmat_pdf');
-                   
-                    echo 'Score: '.$score;
-                    if(!empty($prev_answers))
-                    {
-                        foreach($prev_answers as $q => $ans){
-                            echo '<p>'.$q.' - '.$ans['given_answer']. ' - Correct answer -' .$ans['correct_answer'].'</p>';
-                        }
+            if(true){
+
             
-                       
-                    }else{
-                        foreach($questions as $index => $question){
-                            $_TMP = [];
-                            $_TMP = array_merge($question["option"],[$question["correct_answer"]]);
-                            shuffle($_TMP);
-                    
-                            ?>
-                            <h1><?php echo $question["title"];?></h1>
-                            <p><?php the_content(); ?></p>
-                            <input type="hidden" name="post_id" value="<?php echo $id;?>">
-                            <input type="hidden" name="question_id" value="<?php echo $index;?>">
-                            <?php foreach($_TMP as $opt)
-                            {
-                                ?>
-                                <input 
-                                    type="radio"
-                                    name="option[<?php echo $question['title'];?>][<?php echo $index;?>]"
-                                    value="<?php echo $opt;?>"
-                                    <?php echo ($prev_answers[$question['title']]['given_answer']==$opt)?'checked':''; ?>
-                                    >
-                                <?php echo $opt;?>
-                                <?php
-    
-                            }
-                            ?>
-                            <?php
-    
-                              
-    
-                        }
-                    }
-                    
+                $question_id = trim($_GET['question_id']);
+                $link = get_post_meta($question_id, 'gohar_e_hikmat_pdf',true);
+                $args = [
+                    "posts__in" => [$_GET['question_id']],
+                    "post_type" => "gohar_e_hikmat",
+                    'meta_query'  => array(
+                        array(          
+                            'key'      => 'gh_release',
+                            'compare'  => '<',
+                            'value'    => date('Y-m-d H:i:s') ,
+                            'type'     => 'DATETIME'
+                            )
+                    ),
+                ];
+                $query = new WP_Query($args);
+                $prev_answers = [];
+                $submitted_answers = [];
+                $score = 0;
+                if(is_user_logged_in()){
+                    $user_id        = get_current_user_id();
+                    $prev_answers   = get_user_meta($user_id,'_review_answers_'.$_POST['post_id'],true);
+                    $score          = get_user_meta($user_id,'_score_'.$_POST['post_id'],true);
+                    $prev_answers = json_decode($prev_answers,true);
+                    log::info($prev_answers);
                 }
-                wp_reset_postdata();
-                ?>
-                <input type="submit" value="Submit" name="submit">
-                </form>
-                <?php
-            }
             
+                ob_start();
+        
+                if($query->have_posts())
+                {
+                    ?>
+                    <form action="" method="post">
+                    <?php if($link): ?>
+                    <a href="<?php echo $link;?>" target="_blank">Open Book</a>
+                    <?php endif; ?>
+                    <?php
+                    while($query->have_posts()){
+                        $query->the_post();
+                        $id = get_the_ID();
+                        $display_answer = get_post_meta($id, 'gh_answer_display',true);
+                        $today = date('Y-m-d');
+                        // var_dump([$id, $display_answer < $today,$display_answer , $today]);
+                        $questions = get_post_meta($id,'gohar_e_hikmat_questions',true);
+                        $pdf       = get_post_meta($id,'gohar_e_hikmat_pdf');
+                    
+                        echo 'Score: '.$score;
+                        if(!empty($prev_answers))
+                        {
+                            // foreach($prev_answers as $q => $ans){
+                            //     echo '<p>'.$q.' - '.$ans['given_answer']. ' - Correct answer -' .$ans['correct_answer'].'</p>';
+                            // }
+
+                            echo '<p>You have already submitted gohar e hikmat form, please wait for the result date</p>';
+                
+                        
+                        }else{
+                            foreach($questions as $index => $question){
+                                $_TMP = [];
+                                $_TMP = array_merge($question["option"],[$question["correct_answer"]]);
+                                shuffle($_TMP);
+                        
+                                ?>
+                                <h1><?php echo $question["title"];?></h1>
+                                <p><?php the_content(); ?></p>
+                                <input type="hidden" name="post_id" value="<?php echo $id;?>">
+                                <input type="hidden" name="question_id" value="<?php echo $index;?>">
+                                <?php foreach($_TMP as $opt)
+                                {
+                                    ?>
+                                    <input 
+                                        type="radio"
+                                        name="option[<?php echo $question['title'];?>][<?php echo $index;?>]"
+                                        value="<?php echo $opt;?>"
+                                        <?php echo ($prev_answers[$question['title']]['given_answer']==$opt)?'checked':''; ?>
+                                        >
+                                    <?php echo $opt;?>
+                                    <?php
+        
+                                }
+                                ?>
+                                <?php
+        
+                                
+        
+                            }
+                        }
+                        
+                    }
+                    wp_reset_postdata();
+                    ?>
+                    <input type="submit" value="Submit" name="submit">
+                    </form>
+                    <?php
+                }
+            }
             // return $_GET['question_id'];
         }else{
             
-           echo '<script> window.location.href = "'.site_url().'/member-login"; </script>';
+           echo '<script> window.location.href = "'.site_url().'/member-register"; </script>';
            die;
         }
         $html = ob_get_contents();
@@ -250,35 +256,108 @@ class Gohar_e_Hikmat_Register {
     {
         if(! is_user_logged_in())
         {
-            echo '<script> window.location.href = "'.site_url().'/member-login"; </script>';
+            echo '<script> window.location.href = "'.site_url().'/member-register"; </script>';
            die;
         }
-        $args = [
-            "post_type" =>"gohar_e_hikmat",
-            'meta_query'  => array(
-                array(          
-                       'key'      => 'gh_release',
-                       'compare'  => '<',
-                       'value'    => date('Y-m-d H:i:s') ,
-                       'type'     => 'DATETIME'
-                     )
-             ),
-        ];
-        ob_start();
-    
         
-        $query = new WP_Query($args);
-        if($query->have_posts()){
-            while($query->have_posts())
-            {
-                $query->the_post();
-                ?>
-                <a href="<?php echo home_url( '/single-page/' ).'?question_id='.get_the_ID();?>"><?php echo get_the_title(); ?></a>
-                <?php
-            }
-            wp_reset_postdata();
-        }
+        $usr = wp_get_current_user();
+       
+        ob_start();
+        if(in_array('administrator',$usr->roles))
+        {
+            $users = (get_users(["role__not_in"=> "administrator"]));
+            $args = array(  
+                        'post_type' => 'gohar_e_hikmat',
+                        'posts_per_page' => 1,
+                        'order' => 'ASC',
+                        'meta_query' => array(
+                            'relation' => 'AND',
+                            array(
+                                'key' => 'gh_release',
+                                'value' => date('Y-m-d'),
+                                'compare' => '>=',
+                            ).
+                            array(
+                                'key' => 'gh_answer_display',
+                                'value' => date('Y-m-d'),
+                                'compare' => '<=',
+                            )
+                     )
+                    );
 
+                    $topic_id = 0;
+                    $topic_title = '';
+
+                    $query = new WP_Query($args);
+                    if($query->have_posts()){
+                        while($query->have_posts())
+                        {
+                            $query->the_post();
+                            $topic_id = get_the_ID();
+                            $topic_title = get_the_title();
+                            
+                        }
+                    }
+
+                    // var_dump($users);
+                    ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Topic</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                    <?php
+                    foreach($users as $user){
+                        $score = 0;
+                        $score = get_user_meta($user->data->ID, '_score_'.$topic_id,true);
+                        ?>
+                            <tr>
+                                <td> <?php echo $user->data->user_email; ?></td>
+                                <td> <?php echo $user->data->display_name; ?></td>
+                                <td> <?php echo $topic_title; ?></td>
+                                <td> <?php echo $score; ?></td>
+                            </tr>
+                        <?php
+                    }
+                    ?>
+                    </table>
+                    <?php
+
+
+
+
+
+        }else{
+
+            
+            $args = [
+                "post_type" =>"gohar_e_hikmat",
+                'meta_query'  => array(
+                    array(          
+                        'key'      => 'gh_release',
+                        'compare'  => '<',
+                        'value'    => date('Y-m-d H:i:s') ,
+                        'type'     => 'DATETIME'
+                        )
+                ),
+            ];
+            
+            $query = new WP_Query($args);
+            if($query->have_posts()){
+                while($query->have_posts())
+                {
+                    $query->the_post();
+                    ?>
+                    <a href="<?php echo home_url( '/single-page/' ).'?question_id='.get_the_ID();?>"><?php echo get_the_title(); ?></a>
+                    <?php
+                }
+                wp_reset_postdata();
+            }
+        }
         $html = ob_get_contents();
         ob_end_clean();
     
