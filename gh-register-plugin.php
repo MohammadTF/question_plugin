@@ -57,6 +57,8 @@ class Gohar_e_Hikmat_Register {
         add_action( 'login_form_resetpass', array( $this, 'redirect_to_custom_password_reset' ) );
         add_action( 'login_form_rp', array( $this, 'do_password_reset' ) );
         add_action( 'login_form_resetpass', array( $this, 'do_password_reset' ) );
+        // add_filter( 'wp_new_user_notification_email' , array($this,'edit_user_notification_email'), 10, 3 );
+
 
 
         
@@ -65,11 +67,28 @@ class Gohar_e_Hikmat_Register {
         add_filter( 'login_redirect', array( $this, 'redirect_after_login' ), 10, 3 );
         add_filter( 'retrieve_password_message', array( $this, 'replace_retrieve_password_message' ), 10, 4 );
        
-        add_filter('manage_users_columns', array( $this,'pippin_add_user_id_column'));
-        add_action('manage_users_custom_column',  array( $this,'pippin_show_user_id_column_content'), 10, 3);
+        // add_filter('manage_users_columns', array( $this,'pippin_add_user_id_column'));
+        // add_action('manage_users_custom_column',  array( $this,'pippin_show_user_id_column_content'), 10, 3);
         
         
     }
+
+    function edit_user_notification_email( $wp_new_user_notification_email, $user, $blogname ) {
+
+        $message = sprintf(__( "Welcome to %s! Here's how to log in:" ), $blogname ) . "\r\n";
+        $message .= wp_login_url() . "\r\n";
+        $message .= sprintf(__( 'Username: %s' ), $user->user_login ) . "\r\n";
+        $message .= sprintf(__( 'Password: %s' ), $user->user_pass ) . "\r\n\r\n";
+        $message .= sprintf(__( 'If you have any problems, please contact me at %s.'), get_option( 'admin_email' ) ) . "\r\n";
+        // $message .= __('Adios!');
+        var_dump($wp_new_user_notification_email);
+        die;
+        $wp_new_user_notification_email['message'] = $message;
+    
+        return $wp_new_user_notification_email;
+    
+    }
+
     function pippin_add_user_id_column($columns) {
         $columns['user_score'] = 'Score';
         return $columns;
@@ -195,7 +214,7 @@ class Gohar_e_Hikmat_Register {
                         $questions = get_post_meta($id,'gohar_e_hikmat_questions',true);
                         $pdf       = get_post_meta($id,'gohar_e_hikmat_pdf');
                     
-                        echo 'Score: '.$score;
+                        //echo 'Score: '.$score;
                         if(false)
                         {
                             // foreach($prev_answers as $q => $ans){
@@ -205,6 +224,9 @@ class Gohar_e_Hikmat_Register {
                 
                         
                         }else{
+                            ?>
+                              <p><?php the_content(); ?></p>
+                            <?php
                             foreach($questions as $index => $question){
                                 $_TMP = [];
                                 $_TMP = array_merge($question["option"],[$question["correct_answer"]]);
@@ -212,7 +234,7 @@ class Gohar_e_Hikmat_Register {
                         
                                 ?>
                                 <h1><?php echo $question["title"];?></h1>
-                                <p><?php the_content(); ?></p>
+                              
                                 <input type="hidden" name="post_id" value="<?php echo $id;?>">
                                 <input type="hidden" name="question_id" value="<?php echo $index;?>">
                                 <?php foreach($_TMP as $opt)
@@ -715,12 +737,15 @@ class Gohar_e_Hikmat_Register {
         );
     
         $user_id = wp_insert_user( $user_data );
+        
         wp_new_user_notification( $user_id, $password );
+
         add_user_meta($user_id,'date_of_birth',$date_of_birth);
         add_user_meta($user_id,'nic_passport',$nic_passport);
-         add_user_meta($user_id,'street_address',$street_address);
-         add_user_meta($user_id,'telephone',$telephone);
-         add_user_meta($user_id,'country_id',$country_id);
+        add_user_meta($user_id,'street_address',$street_address);
+        add_user_meta($user_id,'telephone',$telephone);
+        add_user_meta($user_id,'country_id',$country_id);
+
         return $user_id;
     }
 
