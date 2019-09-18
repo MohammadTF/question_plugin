@@ -141,14 +141,28 @@ class Gohar_e_Hikmat_Register {
         }
         if(isset($_GET['question_id']) && '' != ($_GET['question_id']) && is_user_logged_in())
         {
-           
-            if(true){
+            
+            $prev_answers = [];
+            $submitted_answers = [];
+            $score = 0;
+            if(is_user_logged_in()){
+                $user_id        = get_current_user_id();
+                $prev_answers   = get_user_meta($user_id,'_review_answers_'.$_POST['post_id'],true);
+                $score          = get_user_meta($user_id,'_score_'.$_POST['post_id'],true);
+                $prev_answers = json_decode($prev_answers,true);
+                log::info($prev_answers);
+            }
+            if(!empty($prev_answers)){
+                echo '<p>You have already submitted gohar e hikmat form, please wait for the result date</p>';
+                
+            }
+            else{
 
             
                 $question_id = trim($_GET['question_id']);
                 $link = get_post_meta($question_id, 'gohar_e_hikmat_pdf',true);
                 $args = [
-                    "posts__in" => [$_GET['question_id']],
+                    "posts__in" => [$question_id],
                     "post_type" => "gohar_e_hikmat",
                     'meta_query'  => array(
                         array(          
@@ -160,16 +174,7 @@ class Gohar_e_Hikmat_Register {
                     ),
                 ];
                 $query = new WP_Query($args);
-                $prev_answers = [];
-                $submitted_answers = [];
-                $score = 0;
-                if(is_user_logged_in()){
-                    $user_id        = get_current_user_id();
-                    $prev_answers   = get_user_meta($user_id,'_review_answers_'.$_POST['post_id'],true);
-                    $score          = get_user_meta($user_id,'_score_'.$_POST['post_id'],true);
-                    $prev_answers = json_decode($prev_answers,true);
-                    log::info($prev_answers);
-                }
+               
             
                 ob_start();
         
@@ -191,13 +196,12 @@ class Gohar_e_Hikmat_Register {
                         $pdf       = get_post_meta($id,'gohar_e_hikmat_pdf');
                     
                         echo 'Score: '.$score;
-                        if(!empty($prev_answers))
+                        if(false)
                         {
                             // foreach($prev_answers as $q => $ans){
                             //     echo '<p>'.$q.' - '.$ans['given_answer']. ' - Correct answer -' .$ans['correct_answer'].'</p>';
                             // }
 
-                            echo '<p>You have already submitted gohar e hikmat form, please wait for the result date</p>';
                 
                         
                         }else{
