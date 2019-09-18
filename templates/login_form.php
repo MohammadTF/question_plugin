@@ -45,7 +45,7 @@
             <input type="password" name="pwd" id="user_pass">
         </p>
         <p class="login-submit">
-            <input type="submit" value="<?php _e( 'Sign In', 'personalize-login' ); ?>">
+            <input type="submit" value="<?php _e( 'Sign In', 'personalize-login' ); ?>" class="fusion-button-text">
             <a href="<?php echo site_url()."/member-register"; ?>"><?php _e( 'Sign Up', 'personalize-login' ); ?></a>
         </p>
     </form>

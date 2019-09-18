@@ -220,7 +220,7 @@ if(isset($_POST['telephone']))
                 <div class="g-recaptcha" data-sitekey="<?php echo $attributes['recaptcha_site_key']; ?>"></div>
             </div>
         <?php endif; ?>
-            <input type="submit" name="submit" class="register-button"
+            <input type="submit" name="submit" class="register-button fusion-button-text"
                    value="<?php _e( 'Register', 'personalize-login' ); ?>"/>
         </p>
     </form>
