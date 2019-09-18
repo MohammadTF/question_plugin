@@ -46,6 +46,7 @@
         </p>
         <p class="login-submit">
             <input type="submit" value="<?php _e( 'Sign In', 'personalize-login' ); ?>">
+            <a href="<?php echo site_url()."/member-register"; ?>"><?php _e( 'Sign Up', 'personalize-login' ); ?></a>
         </p>
     </form>
 </div>
