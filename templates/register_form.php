@@ -64,16 +64,16 @@ if(isset($_POST['telephone']))
     <form id="signupform" action="<?php echo wp_registration_url(); ?>" method="post">
     <p class="form-row">
             <label for="first_name"><?php _e( 'Name', 'personalize-login' ); ?></label>
-            <input type="text" name="first_name" value="<?php echo $first; ?>" id="first-name">
+            <input required type="text" name="first_name" value="<?php echo $first; ?>" id="first-name">
         </p>
  
         <p class="form-row">
             <label for="last_name"><?php _e( 'Father\'s name', 'personalize-login' ); ?></label>
-            <input type="text" name="last_name" value="<?php echo $last; ?>" id="last-name">
+            <input required type="text" name="last_name" value="<?php echo $last; ?>" id="last-name">
         </p>
         <p class="form-row">
             <label for="email"><?php _e( 'Email', 'personalize-login' ); ?> <strong>*</strong></label>
-            <input type="email" name="email" value="<?php echo $email; ?>" id="email">
+            <input required type="email" name="email" value="<?php echo $email; ?>" id="email">
         </p>
         <p class="form-row">
             <label for="country_id"><?php _e( 'Country', 'personalize-login' ); ?> <strong>*</strong></label>
@@ -81,12 +81,12 @@ if(isset($_POST['telephone']))
         </p>
         <p class="form-row">
             <label for="login_name"><?php _e( 'Login Name', 'personalize-login' ); ?> <strong>*</strong></label>
-            <input type="text" name="login_name" value="<?php echo $login_name; ?>" id="login_name">
+            <input required type="text" name="login_name" value="<?php echo $login_name; ?>" id="login_name">
         </p>
 
         <p class="form-row">
             <label for="date_of_birth">Date of birth</label>
-            <input type="date" name="date_of_birth" value="<?php echo $date_of_birth; ?>" id="date_of_birth">
+            <input required type="date" name="date_of_birth" value="<?php echo $date_of_birth; ?>" id="date_of_birth">
 					   
 					  <!-- <select id="daydropdown" name="daydropdown" style="width:70px">
 								<option value="1">1</option>
@@ -198,7 +198,7 @@ if(isset($_POST['telephone']))
        
         <p class="form-row">
             <label for="nic_passport">NIC/Passport</label>
-            <input type="text" name="nic_passport" value="<?php echo $nic_passport;?>" id="nic_passport">
+            <input required type="text" name="nic_passport" value="<?php echo $nic_passport;?>" id="nic_passport">
         </p>
         <p class="form-row">
             <label for="street_address">Street Address</label>
@@ -207,7 +207,7 @@ if(isset($_POST['telephone']))
  
         <p class="form-row">
             <label for="telephone">Telephone</label>
-            <input type="tel" name="telephone" value="<?php echo $telephone;?>" id="telephone">
+            <input required type="tel" name="telephone" value="<?php echo $telephone;?>" id="telephone">
         </p>
  
         <p class="form-row">
