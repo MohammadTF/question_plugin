@@ -208,7 +208,7 @@ class Gohar_e_Hikmat_Register {
 
     {
 
-        if(isset($_POST['submit']) && isset($_POST['option']) && !empty($_POST['option']))
+        if(isset($_POST['submit']))
 
         {
 
@@ -456,11 +456,9 @@ class Gohar_e_Hikmat_Register {
 
                             <?php
 
-                            foreach($questions as $index => $question){ ?>
+                            foreach($questions as $index => $question){
 
-                                <div class="gh_questions">
-
-                                <?php $_TMP = [];
+                                $_TMP = [];
 
                                 $_TMP = array_merge($question["option"],[$question["correct_answer"]]);
 
@@ -478,7 +476,7 @@ class Gohar_e_Hikmat_Register {
 
                                 <input type="hidden" name="question_id" value="<?php echo $index;?>">
 
-                                <ul>
+                                <ul style="list-style: none;">
 
                                 <?php foreach($_TMP as $opt)
 
@@ -486,7 +484,11 @@ class Gohar_e_Hikmat_Register {
 
                                     ?>
 
-                                    <li><input type="radio" name="option[<?php echo $question['title'];?>][<?php echo $index;?>]"
+                                    <li><input 
+
+                                        type="radio"
+
+                                        name="option[<?php echo $question['title'];?>][<?php echo $index;?>]"
 
                                         value="<?php echo $opt;?>"
 
@@ -494,9 +496,7 @@ class Gohar_e_Hikmat_Register {
 
                                         >
 
-                                    <?php echo $opt;?>
-
-                                    </li>  
+                                    <?php echo $opt;?></li>
 
                                     <?php
 
@@ -504,9 +504,7 @@ class Gohar_e_Hikmat_Register {
 
                                 }
 
-                                ?>
-
-                                </ul>
+                                ?></ul>
 
                                 <?php
 
@@ -516,7 +514,7 @@ class Gohar_e_Hikmat_Register {
 
         
 
-                            } ?> </div><?php
+                            }
 
                         }
 
@@ -528,7 +526,7 @@ class Gohar_e_Hikmat_Register {
 
                     ?>
 
-                    <input type="submit" value="Submit" class="fusion-button button-flat fusion-button-default-shape fusion-button-default-size button-default button-1 fusion-button-default-span fusion-button-default-type" name="submit">
+                    <input type="submit" class="fusion-button button-flat fusion-button-default-shape fusion-button-default-size button-default button-1 fusion-button-default-span fusion-button-default-type" value="Submit" name="submit">
 
                     </form>
 
@@ -660,7 +658,7 @@ class Gohar_e_Hikmat_Register {
 
                     ?>
 
-                    <table>
+                    <table cellpadding="5" cellspacing="5" border="1" width="80%">
 
                         <thead>
 
@@ -2232,7 +2230,7 @@ class Gohar_e_Hikmat_Register {
 
             'single-page' => array(
 
-                'title' => __( 'Single Question Page', 'personalize-login' ),
+                'title' => __( 'Question / Answers', 'personalize-login' ),
 
                 'content' => '['.Gohar_e_Hikmat_Register::single_page.']' //custom-password-reset-form
 

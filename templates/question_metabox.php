@@ -15,6 +15,12 @@
     <?php if($link): ?>
     <a href="<?php echo $link;?>" target="_blank">View</a>
     <?php endif; ?>
+    <br>
+    <label for="gh_pdf_roman">Upload PDF in Roman:</label>
+    <input type="file" name="gh_pdf_roman" id="gh_pdf_roman">
+    <?php if($linkroman): ?>
+    <a href="<?php echo $linkroman;?>" target="_blank">View</a>
+    <?php endif; ?>
     <div>
             <label for="release">Release Date:</label>
             <input type="date" name="gh_release" value="<?php echo $release;?>" id="release">

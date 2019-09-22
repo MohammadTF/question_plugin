@@ -105,6 +105,19 @@ class Gohar_e_Hikmat_Questions{
 		
 				} // end if/else
 			} // end if/else
+
+            if( ! empty( $_FILES ) && isset( $_FILES['gh_pdf_roman'] ) ) {
+                // Upload the goal image to the uploads directory, resize the image, then upload the resized version
+                
+                $goal_image_file = wp_upload_bits( $_FILES['gh_pdf_roman']['name'], null, @file_get_contents( $_FILES['gh_pdf_roman']['tmp_name'] ) );
+
+                if( false == $goal_image_file['error'] ) {
+                
+                    // Since we've already added the key for this, we'll just update it with the file.
+                    update_post_meta( $post_id, 'gohar_e_hikmat_pdf_roman', $goal_image_file['url'] );
+        
+                } // end if/else
+            } // end if/else
 				//
         }
        
