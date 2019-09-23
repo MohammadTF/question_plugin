@@ -8,6 +8,7 @@
     $link = get_post_meta($post->ID, 'gohar_e_hikmat_pdf',true);
     $release = get_post_meta($post->ID, 'gh_release',true);
     $answer_display = get_post_meta($post->ID, 'gh_answer_display',true);
+    $correct_answer_check = get_post_meta($post->ID, 'correct_answer_check',true);
 ?>
 <div>
     <label for="gh_pdf">Upload PDF:</label>
@@ -53,20 +54,24 @@
             <div>
                 <label for="option_1_1">Option 1</label>
                 <input type="text" class="options" id="option_1_1" name="gh_question[0][option][]" value="" >
+                <input type="radio" class="options" name="correct_answer_check_1" value="1" >
                 
             </div>
             <div>
                 <label for="option_1_2">Option 2</label>
                 <input type="text" class="options" id="option_1_2" name="gh_question[0][option][]" value="" >
+                <input type="radio" class="options" name="correct_answer_check_1" value="2" >
             </div>
             <div>
                 <label for="option_1_3">Option 3</label>
                 <input type="text" class="options" id="option_1_3" name="gh_question[0][option][]" value="" >
+                <input type="radio" class="options" name="correct_answer_check_1" value="3" >
             </div>
-            <!-- <div>
+            <div>
                 <label for="option_1_4">Option 4</label>
                 <input type="text" class="options" id="option_1_4" name="gh_question[0][option][]" value="" >
-            </div> -->
+                <input type="radio" class="options" name="correct_answer_check_1" value="4" >
+            </div>
         </div>
         <div>
             <a href="#" class="gh_clone-btn gh_add-btn">Add Question</a>
@@ -74,6 +79,7 @@
         </div>
 
     </div>
+    <input type="hidden" id="next_ite" value="2">
 
 <?php else: ?>
 <?php
@@ -99,20 +105,24 @@ foreach($data as $d=>$v)
             <div>
                 <label for="option_<?php echo $index;?>_1">Option 1</label>
                 <input type="text" class="options" id="option_<?php echo $index;?>_1" name="gh_question[<?php echo $d;?>][option][0]" value="<?php echo $v['option'][0]['answer'];?>" >
+                <input type="radio" class="options" name="correct_answer_check_<?php echo $index; ?>" value="1" <?php echo $correct_answer_check === 1 ?'checked':''?>>
                 
             </div>
             <div>
                 <label for="option_<?php echo $index;?>_2">Option 2</label>
                 <input type="text" class="options" id="option_<?php echo $index;?>_2" name="gh_question[<?php echo $d;?>][option][1]" value="<?php echo $v['option'][1]['answer'];?>" >
+                <input type="radio" class="options" name="correct_answer_check_<?php echo $index; ?>" value="2" <?php echo $correct_answer_check === 2 ?'checked':''?>>
             </div>
             <div>
                 <label for="option_<?php echo $index;?>_3">Option 3</label>
                 <input type="text" class="options" id="option_<?php echo $index;?>_3" name="gh_question[<?php echo $d;?>][option][2]" value="<?php echo $v['option'][2]['answer'];?>" >
+                <input type="radio" class="options" name="correct_answer_check_<?php echo $index; ?>" value="3" <?php echo $correct_answer_check === 3 ?'checked':''?>>
             </div>
-            <!-- <div>
-                <label for="option_1_4">Option 4</label>
-                <input type="text" class="options" id="option_1_4" name="gh_question[0][option][]" value="" >
-            </div> -->
+            <div>
+                <label for="option_<?php echo $index;?>_4">Option 4</label>
+                <input type="text" class="options" id="option_<?php echo $index;?>_4" name="gh_question[<?php echo $d;?>][option][3]" value="<?php echo $v['option'][3]['answer'];?>" >
+                <input type="radio" class="options" name="correct_answer_check_<?php echo $index; ?>" value="4" <?php echo $correct_answer_check === 4 ?'checked':''?>>
+            </div>
         </div>
         <div>
             <a href="#" class="gh_clone-btn gh_add-btn">Add Question</a>
@@ -123,6 +133,7 @@ foreach($data as $d=>$v)
 <?php
 }
  ?>
+ <input type="hidden" id="next-ite" value="<?php echo $index+1;?>">
 <?php endif; ?>
 </div>
 <script>
@@ -131,6 +142,10 @@ jQuery().ready(function($){
         e.preventDefault();
         var length  = $('.gh_question_inner').length;
         var index   = +length + 1;
+
+        index = $('#next-ite').val();
+
+        $('#next-ite').val(+index+1);
         
         var clonned = $('.gh_question_inner').first().clone(true);
         clonned.find('label[for="question_1"]').attr("for","question_"+index);
@@ -147,22 +162,27 @@ jQuery().ready(function($){
         clonned.find('label[for="option_'+index+'_1"]').next().attr("id","option_"+index+"_1")
                                             .attr("name","gh_question["+index+"][option][]")
                                             .attr("val","");
+        clonned.find('#option_'+index+'_1').next().attr("name","correct_answer_check_"+index);
+        
 
         clonned.find('label[for="option_1_2"]').attr("for","option_"+index+"_2");
         clonned.find('label[for="option_'+index+'_2"]').next().attr("id","option_"+index+"_2")
                                             .attr("name","gh_question["+index+"][option][]")
                                             .attr("val","");
+        clonned.find('#option_'+index+'_2').next().attr("name","correct_answer_check_"+index);
 
         clonned.find('label[for="option_1_3"]').attr("for","option_"+index+"_3");
         clonned.find('label[for="option_'+index+'_3"]').next().attr("id","option_"+index+"_3")
                                             .attr("name","gh_question["+index+"][option][]")
                                             .attr("val","");
+        clonned.find('#option_'+index+'_3').next().attr("name","correct_answer_check_"+index);
 
-        // clonned.find('label[for="option_1_4"]').attr("for","option_"+index+"_4");
-        // clonned.find('label[for="option_'+index+'_4"]').next().attr("id","option_"+index+"_4")
-        //                                     .attr("name","gh_question["+index+"][option][]")
-        //                                     .attr("val","");
-        debugger;
+        clonned.find('label[for="option_1_4"]').attr("for","option_"+index+"_4");
+        clonned.find('label[for="option_'+index+'_4"]').next().attr("id","option_"+index+"_4")
+                                            .attr("name","gh_question["+index+"][option][]")
+                                            .attr("val","");
+        clonned.find('#option_'+index+'_4').next().attr("name","correct_answer_check_"+index);
+        // debugger;
         $('#gh_question_wrapper').append(clonned);
 
     });
@@ -170,6 +190,8 @@ jQuery().ready(function($){
         e.preventDefault();
         if($('.gh_question_inner').length > 1)
         {
+            var  index = $('#next-ite').val();
+            $('#next-ite').val(+index-1);
             $(this).parent().parent().remove();
         }
         
