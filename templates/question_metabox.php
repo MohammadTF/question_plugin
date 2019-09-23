@@ -45,7 +45,7 @@
             
         </div>
        
-        <div>
+        <div hidden>
             <label for="correct_answer_1">Correct Answer:</label>
             <input type="text" name="gh_question[0][correct_answer]" value="" id="correct_answer_1">
             
@@ -96,7 +96,7 @@ foreach($data as $d=>$v)
             
         </div>
        
-        <div>
+        <div hidden>
             <label for="correct_answer_<?php echo $index;?>">Correct Answer:</label>
             <input type="text" name="gh_question[<?php echo $d;?>][correct_answer]" value="<?php echo $v['correct_answer']['answer'];?>" id="correct_answer_<?php echo $index;?>">
             

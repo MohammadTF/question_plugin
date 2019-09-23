@@ -76,7 +76,7 @@ class Gohar_e_Hikmat_Register {
 
     public function __construct() {
 
-        wp_enqueue_script( 'tt-mobile-menu', 'https://code.jquery.com/jquery-3.4.1.min.js', array('jquery'), '1.0', true );
+        // wp_enqueue_script( 'tt-mobile-menu', 'https://code.jquery.com/jquery-3.4.1.min.js', array('jquery'), '1.0', true );
 
         add_shortcode( Gohar_e_Hikmat_Register::login_form_shortcode, array( $this, 'render_login_form' ) );
 
@@ -443,7 +443,7 @@ class Gohar_e_Hikmat_Register {
 
             if(!empty($prev_answers)){
 
-                echo '<p>You have already submitted gohar e hikmat form, please wait for the result date</p>';
+                echo '<p>You have successfully submitted gohar e hikmat form, please wait for the result date</p>';
 
                 
 
@@ -594,12 +594,13 @@ class Gohar_e_Hikmat_Register {
                           
                             foreach($questions as $index => $question){
 
-                                $_TMP = [];
+                                // $_TMP = [];
 
-                                $_TMP = array_merge($question["option"],[$question["correct_answer"]]);
-
-                                shuffle($_TMP);
-
+                                // $_TMP = array_merge($question["option"],[$question["correct_answer"]]);
+                                
+                                // shuffle($_TMP);
+                                
+                                $_TMP = $question["option"];
                         
 
                                 ?>
