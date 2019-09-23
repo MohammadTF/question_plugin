@@ -92,22 +92,22 @@ foreach($data as $d=>$v)
        
         <div>
             <label for="correct_answer_<?php echo $index;?>">Correct Answer:</label>
-            <input type="text" name="gh_question[<?php echo $d;?>][correct_answer]" value="<?php echo $v['correct_answer']?>" id="correct_answer_<?php echo $index;?>">
+            <input type="text" name="gh_question[<?php echo $d;?>][correct_answer]" value="<?php echo $v['correct_answer']['answer'];?>" id="correct_answer_<?php echo $index;?>">
             
         </div>
         <div>
             <div>
                 <label for="option_<?php echo $index;?>_1">Option 1</label>
-                <input type="text" class="options" id="option_<?php echo $index;?>_1" name="gh_question[<?php echo $d;?>][option][0]" value="<?php echo $v['option'][0]?>" >
+                <input type="text" class="options" id="option_<?php echo $index;?>_1" name="gh_question[<?php echo $d;?>][option][0]" value="<?php echo $v['option'][0]['answer'];?>" >
                 
             </div>
             <div>
                 <label for="option_<?php echo $index;?>_2">Option 2</label>
-                <input type="text" class="options" id="option_<?php echo $index;?>_2" name="gh_question[<?php echo $d;?>][option][1]" value="<?php echo $v['option'][1];?>" >
+                <input type="text" class="options" id="option_<?php echo $index;?>_2" name="gh_question[<?php echo $d;?>][option][1]" value="<?php echo $v['option'][1]['answer'];?>" >
             </div>
             <div>
                 <label for="option_<?php echo $index;?>_3">Option 3</label>
-                <input type="text" class="options" id="option_<?php echo $index;?>_3" name="gh_question[<?php echo $d;?>][option][2]" value="<?php echo $v['option'][2]?>" >
+                <input type="text" class="options" id="option_<?php echo $index;?>_3" name="gh_question[<?php echo $d;?>][option][2]" value="<?php echo $v['option'][2]['answer'];?>" >
             </div>
             <!-- <div>
                 <label for="option_1_4">Option 4</label>

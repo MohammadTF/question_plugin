@@ -89,7 +89,21 @@ class Gohar_e_Hikmat_Questions{
         
         if ($post->post_type == 'gohar_e_hikmat') { // define your own post type here
             
-            update_post_meta($post_id, 'gohar_e_hikmat_questions',  $_POST['gh_question']  );
+            $_tmp_gh_question = $_POST['gh_question'];
+
+            foreach($_POST['gh_question'] as $ind => $question)
+            {
+                $_tmp_gh_question[$ind]['correct_answer'] = ['answer' => $question['correct_answer'],'answer_id' => 0];
+                foreach($question['option'] as $opt => $option)
+                {
+                    $_tmp_gh_question[$ind]['option'][$opt] = ['answer' => $question['option'][$opt],'answer_id' => $opt+1];
+                    
+                }
+              
+            }
+
+         
+            update_post_meta($post_id, 'gohar_e_hikmat_questions',  $_tmp_gh_question  );
             update_post_meta($post_id, 'gh_release',  $_POST['gh_release']  );
             update_post_meta($post_id, 'gh_answer_display',  $_POST['gh_answer_display']  );
             

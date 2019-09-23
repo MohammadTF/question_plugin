@@ -161,7 +161,7 @@ class Gohar_e_Hikmat_Register {
             exit("No naughty business please");
          } 
          
-         $questions = get_post_meta($_POST['post_id'],'gohar_e_hikmat_questions',true);
+         $question_data = get_post_meta($_POST['post_id'],'gohar_e_hikmat_questions',true);
 
          $submitted = $_POST['option'];
          $question = $_POST['question'];
@@ -177,29 +177,30 @@ class Gohar_e_Hikmat_Register {
 
          {
 
-             foreach($questions as  $question_data)
-
-             {
+            
 
                  $_TMP = $ans;
 
-                 if($ques === $question_data['title']  )
+               
+
+                 if(isset($question_data[$ques])  && !empty($question_data[$ques]) && isset($question_data[$ques]['title'])  )
 
                  {
+                     
                  
-                     $given_answers[$question_data['title']]   = [
+                     $given_answers[$ques]   = [
 
-                         'question'  => $question_data['title'],
+                         'question'  => $question_data[$ques]['title'],
 
                          'given_answer'    => $_TMP,
 
-                         'correct_answer'    => $question_data['correct_answer']
+                         'correct_answer'    => $question_data[$ques]['correct_answer']
 
                      ];
 
                  }
 
-             }
+            
 
          }
 
@@ -207,10 +208,22 @@ class Gohar_e_Hikmat_Register {
 
 
 
-
+        //  print_r($submitted);
+        //  print_r($given_answers);
          
+         $saved_ans = get_user_meta($user_id,'_save_answers_'.$_POST['post_id'],true);
+         $saved_ans = (json_decode($saved_ans,true));
+         $tmp = [];
+         if(!empty($saved_ans))
+         {
+            // $given_answers[key($saved_ans)] = $saved_ans;
+            //  array_push($given_answers, $saved_ans);
 
-          update_user_meta($user_id,'_save_answers_'.$_POST['post_id'],json_encode($given_answers));
+         }
+         $saved_ans[key($given_answers)] = $given_answers[key($given_answers)];
+        //  print_r($saved_ans);
+          update_user_meta($user_id,'_save_answers_'.$_POST['post_id'],json_encode($saved_ans));
+        //   update_user_meta($user_id,'_save_answers_'.$_POST['post_id'],'');
     
 
           echo 'answer saved';
@@ -280,7 +293,7 @@ class Gohar_e_Hikmat_Register {
     public function render_single_page()
 
     {
-
+        // delete_user_meta(21,'_review_answers_488');
         if(isset($_POST['submit']) && isset($_POST['option']) && !empty($_POST['option']))
 
         {
@@ -289,6 +302,7 @@ class Gohar_e_Hikmat_Register {
 
             $submitted = $_POST['option'];
 
+            // var_dump($submitted);die;
             $given_answers = [];
 
             $score = 0;
@@ -297,21 +311,21 @@ class Gohar_e_Hikmat_Register {
 
             {
 
-                foreach($questions as  $question_data)
+                foreach($questions as  $question_id_ =>$question_data)
 
                 {
 
                     $_TMP = $ans;
+                    
+                    // $_TMP = array_values($_TMP);
 
-                    $_TMP = array_values($_TMP);
+                    // $_TMP = isset($_TMP[0])?$_TMP[0]:'';
 
-                    $_TMP = isset($_TMP[0])?$_TMP[0]:'';
-
-                    if($ques === $question_data['title']  )
+                    if($ques === $question_id_  )
 
                     {
 
-                        $given_answers[$question_data['title']]   = [
+                        $given_answers[$question_id_]   = [
 
                             'question'  => $question_data['title'],
 
@@ -324,8 +338,7 @@ class Gohar_e_Hikmat_Register {
 
 
                         // $given_answers[$question_data['title']] =  $_TMP;
-
-                        if($_TMP === $question_data['correct_answer'])
+                        if($_TMP == $question_data['correct_answer']['answer_id'])
 
                         {
 
@@ -346,6 +359,8 @@ class Gohar_e_Hikmat_Register {
                 }
 
             }
+
+
 
 
 
@@ -597,7 +612,7 @@ class Gohar_e_Hikmat_Register {
 
                                 <ul style="list-style: none;">
 
-                                <?php foreach($_TMP as $opt)
+                                <?php foreach($_TMP as $i => $opt)
 
                                 {
 
@@ -607,21 +622,29 @@ class Gohar_e_Hikmat_Register {
 
                                         type="radio"
 
-                                        name="option[<?php echo $question['title'];?>][<?php echo $index;?>]"
+                                        name="option[<?php echo $index;?>]"
 
-                                        data-question="<?php echo $question['title']?>"
+                                        data-question="<?php echo $index?>"
 
-                                        value="<?php echo $opt;?>"
+                                        value="<?php echo $opt['answer_id'];?>"
 
                                         data-post_id="<?php echo $id; ?>"
 
                                         class="radio-save"
 
-                                        <?php echo ($save_answer[$question['title']]['given_answer']==$opt)?'checked':''; ?>
+                                        <?php
+                                        if($save_answer[$index]['given_answer']=='')
+                                        {
+
+                                        }else{
+
+                                            echo ($save_answer[$index]['given_answer']==$opt['answer_id'])?'checked':''; 
+                                        }
+                                         ?>
 
                                         >
 
-                                    <?php echo $opt;?></li>
+                                    <?php echo $opt['answer'];?></li>
 
                                     <?php
 
