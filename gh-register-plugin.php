@@ -76,6 +76,8 @@ class Gohar_e_Hikmat_Register {
 
     public function __construct() {
 
+        wp_enqueue_script( 'tt-mobile-menu', 'https://code.jquery.com/jquery-3.4.1.min.js', array('jquery'), '1.0', true );
+
         add_shortcode( Gohar_e_Hikmat_Register::login_form_shortcode, array( $this, 'render_login_form' ) );
 
         add_shortcode( Gohar_e_Hikmat_Register::register_form_shortcode, array( $this, 'render_register_form' ) );
@@ -139,11 +141,82 @@ class Gohar_e_Hikmat_Register {
         // add_filter('manage_users_columns', array( $this,'pippin_add_user_id_column'));
 
         // add_action('manage_users_custom_column',  array( $this,'pippin_show_user_id_column_content'), 10, 3);
-
+       
+        add_action( 'wp_enqueue_scripts', array($this,'my_enqueue') );
+        add_action("wp_ajax_save_answer", array($this,"save_answer"));
         
 
-        
+    }
 
+    function my_enqueue() {
+
+        wp_localize_script( 'my_voter_script', 'myAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));        
+
+        wp_enqueue_script( 'my_voter_script' );
+
+    }
+
+    function save_answer(){
+        if ( !wp_verify_nonce( $_REQUEST['nonce'], "save_answer")) {
+            exit("No naughty business please");
+         } 
+         
+         $questions = get_post_meta($_POST['post_id'],'gohar_e_hikmat_questions',true);
+
+         $submitted = $_POST['option'];
+         $question = $_POST['question'];
+         
+         $submitted = [$question => $_POST['option']];
+
+         $given_answers = [];
+
+         $score = 0;
+
+
+         foreach($submitted as $ques => $ans)
+
+         {
+
+             foreach($questions as  $question_data)
+
+             {
+
+                 $_TMP = $ans;
+
+                 if($ques === $question_data['title']  )
+
+                 {
+                 
+                     $given_answers[$question_data['title']]   = [
+
+                         'question'  => $question_data['title'],
+
+                         'given_answer'    => $_TMP,
+
+                         'correct_answer'    => $question_data['correct_answer']
+
+                     ];
+
+                 }
+
+             }
+
+         }
+
+         $user_id = get_current_user_id();
+
+
+
+
+         
+
+          update_user_meta($user_id,'_save_answers_'.$_POST['post_id'],json_encode($given_answers));
+    
+
+          echo 'answer saved';
+
+
+         die;
     }
 
 
@@ -208,7 +281,7 @@ class Gohar_e_Hikmat_Register {
 
     {
 
-        if(isset($_POST['submit']))
+        if(isset($_POST['submit']) && isset($_POST['option']) && !empty($_POST['option']))
 
         {
 
@@ -278,6 +351,7 @@ class Gohar_e_Hikmat_Register {
 
             if(is_user_logged_in()){
 
+                
                 $user_id = get_current_user_id();
 
 
@@ -291,8 +365,7 @@ class Gohar_e_Hikmat_Register {
                 update_user_meta($user_id,'_review_answers_'.$_POST['post_id'],json_encode($given_answers));
 
                 update_user_meta($user_id,'_score_'.$_POST['post_id'],$score);
-
-
+                
 
                 $log  = "Answer Submit: ".$_SERVER['REMOTE_ADDR'].' - '.date("F j, Y, g:i a").PHP_EOL.
 
@@ -325,6 +398,7 @@ class Gohar_e_Hikmat_Register {
             
 
             $prev_answers = [];
+            $save_answer = [];
 
             $submitted_answers = [];
 
@@ -334,12 +408,18 @@ class Gohar_e_Hikmat_Register {
 
                 $user_id        = get_current_user_id();
 
-                $prev_answers   = get_user_meta($user_id,'_review_answers_'.$_POST['post_id'],true);
-
+                
                 $score          = get_user_meta($user_id,'_score_'.$_POST['post_id'],true);
-
+                
+                $prev_answers   = get_user_meta($user_id,'_review_answers_'.$_POST['post_id'],true);
                 $prev_answers = json_decode($prev_answers,true);
 
+              
+                $save_answer   = get_user_meta($user_id,'_save_answers_'.$_GET['question_id'],true);
+                $save_answer = json_decode($save_answer,true);
+                
+               
+                // var_dump( $save_answer  );die;
                 log::info($prev_answers);
 
             }
@@ -361,6 +441,7 @@ class Gohar_e_Hikmat_Register {
                 $question_id = trim($_GET['question_id']);
 
                 $link = get_post_meta($question_id, 'gohar_e_hikmat_pdf',true);
+                $link_roman = get_post_meta($question_id, 'gohar_e_hikmat_pdf_roman',true);
 
                 $args = [
 
@@ -399,14 +480,51 @@ class Gohar_e_Hikmat_Register {
                 if($query->have_posts())
 
                 {
+                    $nonce = wp_create_nonce("save_answer");
+                    $ajax_url = admin_url( 'admin-ajax.php' );
 
                     ?>
+                        <script>
+                                  (function($) {
 
+                                    // Use $() inside of this function
+
+                                  $().ready(function(){
+                                      $('.radio-save').on('change',function(e){
+                                        var nonce = $('#nonce').val();
+                                        var post_id = $(this).data('post_id');
+                                        var option = $(this).val();
+                                        var question = $(this).data('question');
+                                        $.ajax({
+                                                type : "post",
+                                                dataType : "json",
+                                                url : "<?php echo $ajax_url;?>",
+                                                data : {action: "save_answer",
+                                                    nonce: nonce,
+                                                     post_id: post_id,
+                                                     option:option,
+                                                     question:question
+                                                    },
+                                                success: function(response) {
+                                                   console.log(response);
+                                                }
+                                            })   
+                                      });
+                                  });
+                                
+
+                                })(jQuery);
+                                  </script>
                     <form action="" method="post">
-
+                                <input type="hidden" name="nonce" id="nonce" value="<?php echo $nonce;?>">
                     <?php if($link): ?>
 
                     <a class="fusion-button button-flat fusion-button-default-shape fusion-button-default-size button-default button-1 fusion-button-default-span fusion-button-default-type" target="_blank" href="<?php echo $link;?>"><span class="fusion-button-text">Open Book</span></a>
+
+                    <?php endif; ?>
+                    <?php if($link_roman): ?>
+
+                    <a class="fusion-button button-flat fusion-button-default-shape fusion-button-default-size button-default button-1 fusion-button-default-span fusion-button-default-type" target="_blank" href="<?php echo $link_roman;?>"><span class="fusion-button-text">Open Book(Roman)</span></a>
 
                     <?php endif; ?>
 
@@ -453,9 +571,10 @@ class Gohar_e_Hikmat_Register {
                             ?>
 
                               <p><?php //the_content(); ?></p>
+                              
 
                             <?php
-
+                          
                             foreach($questions as $index => $question){
 
                                 $_TMP = [];
@@ -490,9 +609,15 @@ class Gohar_e_Hikmat_Register {
 
                                         name="option[<?php echo $question['title'];?>][<?php echo $index;?>]"
 
+                                        data-question="<?php echo $question['title']?>"
+
                                         value="<?php echo $opt;?>"
 
-                                        <?php echo ($prev_answers[$question['title']]['given_answer']==$opt)?'checked':''; ?>
+                                        data-post_id="<?php echo $id; ?>"
+
+                                        class="radio-save"
+
+                                        <?php echo ($save_answer[$question['title']]['given_answer']==$opt)?'checked':''; ?>
 
                                         >
 
