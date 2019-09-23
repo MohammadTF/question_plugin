@@ -293,7 +293,7 @@ class Gohar_e_Hikmat_Register {
     public function render_single_page()
 
     {
-        // delete_user_meta(21,'_review_answers_488');
+        // delete_user_meta(10,'_review_answers_14');
         if(isset($_POST['submit']) && isset($_POST['option']) && !empty($_POST['option']))
 
         {
@@ -316,6 +316,8 @@ class Gohar_e_Hikmat_Register {
                 {
 
                     $_TMP = $ans;
+
+                    
                     
                     // $_TMP = array_values($_TMP);
 
@@ -360,7 +362,7 @@ class Gohar_e_Hikmat_Register {
 
             }
 
-
+            
 
 
 
@@ -830,7 +832,46 @@ class Gohar_e_Hikmat_Register {
 
                         $score = 0;
 
-                        $score = get_user_meta($user->data->ID, '_score_'.$topic_id,true);
+                        // $score = get_user_meta($user->data->ID, '_score_'.$topic_id,true);
+                        $submitted = get_user_meta($user->data->ID, '_review_answers_'.$topic_id,true);
+                        $submitted = json_decode($submitted,true);
+
+                        $questions = get_post_meta($topic_id,'gohar_e_hikmat_questions',true);
+                        $score = 0;
+
+                       
+                        if(null != $submitted)
+                        {
+                            foreach($submitted as $ques => $ans)
+                            {
+
+                                foreach($questions as  $question_id_ =>$question_data)
+                                {
+
+                                    $_TMP = $ans;
+
+                                    if($ques === $question_id_  )
+                                    {
+                                        // $given_answers[$question_data['title']] =  $_TMP;
+                                        if($_TMP['correct_answer']['answer_id'] == $question_data['correct_answer']['answer_id'])
+
+                                        {
+                                            ++$score;
+                                        }else{
+                                            --$score;
+                                        }
+                                    }
+
+                                }
+
+                            }
+
+                        }
+                        
+                        
+
+
+
 
                         ?>
 

@@ -8,7 +8,7 @@
     $link = get_post_meta($post->ID, 'gohar_e_hikmat_pdf',true);
     $release = get_post_meta($post->ID, 'gh_release',true);
     $answer_display = get_post_meta($post->ID, 'gh_answer_display',true);
-    $correct_answer_check = get_post_meta($post->ID, 'correct_answer_check',true);
+    // $correct_answer_check = get_post_meta($post->ID, 'correct_answer_check',true);
 ?>
 <div>
     <label for="gh_pdf">Upload PDF:</label>
@@ -105,23 +105,23 @@ foreach($data as $d=>$v)
             <div>
                 <label for="option_<?php echo $index;?>_1">Option 1</label>
                 <input type="text" class="options" id="option_<?php echo $index;?>_1" name="gh_question[<?php echo $d;?>][option][0]" value="<?php echo $v['option'][0]['answer'];?>" >
-                <input type="radio" class="options" name="correct_answer_check_<?php echo $index; ?>" value="1" <?php echo $correct_answer_check === 1 ?'checked':''?>>
+                <input type="radio" class="options" name="correct_answer_check_<?php echo $index; ?>" value="1" <?php echo $v['correct_answer']['answer_id'] == 1 ?'checked':''?>>
                 
             </div>
             <div>
                 <label for="option_<?php echo $index;?>_2">Option 2</label>
                 <input type="text" class="options" id="option_<?php echo $index;?>_2" name="gh_question[<?php echo $d;?>][option][1]" value="<?php echo $v['option'][1]['answer'];?>" >
-                <input type="radio" class="options" name="correct_answer_check_<?php echo $index; ?>" value="2" <?php echo $correct_answer_check === 2 ?'checked':''?>>
+                <input type="radio" class="options" name="correct_answer_check_<?php echo $index; ?>" value="2" <?php echo $v['correct_answer']['answer_id'] == 2 ?'checked':''?>>
             </div>
             <div>
                 <label for="option_<?php echo $index;?>_3">Option 3</label>
                 <input type="text" class="options" id="option_<?php echo $index;?>_3" name="gh_question[<?php echo $d;?>][option][2]" value="<?php echo $v['option'][2]['answer'];?>" >
-                <input type="radio" class="options" name="correct_answer_check_<?php echo $index; ?>" value="3" <?php echo $correct_answer_check === 3 ?'checked':''?>>
+                <input type="radio" class="options" name="correct_answer_check_<?php echo $index; ?>" value="3" <?php echo $v['correct_answer']['answer_id'] == 3 ?'checked':''?>>
             </div>
             <div>
                 <label for="option_<?php echo $index;?>_4">Option 4</label>
                 <input type="text" class="options" id="option_<?php echo $index;?>_4" name="gh_question[<?php echo $d;?>][option][3]" value="<?php echo $v['option'][3]['answer'];?>" >
-                <input type="radio" class="options" name="correct_answer_check_<?php echo $index; ?>" value="4" <?php echo $correct_answer_check === 4 ?'checked':''?>>
+                <input type="radio" class="options" name="correct_answer_check_<?php echo $index; ?>" value="4" <?php echo $v['correct_answer']['answer_id'] == 4 ?'checked':''?>>
             </div>
         </div>
         <div>

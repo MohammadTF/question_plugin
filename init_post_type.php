@@ -93,7 +93,13 @@ class Gohar_e_Hikmat_Questions{
 
             foreach($_POST['gh_question'] as $ind => $question)
             {
-                $_tmp_gh_question[$ind]['correct_answer'] = ['answer' => $question['correct_answer'],'answer_id' => 0];
+                // $_tmp_gh_question[$ind]['correct_answer'] = ['answer' => $question['correct_answer'],'answer_id' => 0];
+                $index = $ind + 1;
+                $_tmp_gh_question[$ind]['correct_answer'] = [];
+                if(isset($_POST['correct_answer_check_'.$index]) && !empty($_POST['correct_answer_check_'.$index]))
+                {
+                    $_tmp_gh_question[$ind]['correct_answer'] = ['answer' => $question['option'][$_POST['correct_answer_check_'.$index]-1],'answer_id' => $_POST['correct_answer_check_'.$index]];
+                }
                 foreach($question['option'] as $opt => $option)
                 {
                     $_tmp_gh_question[$ind]['option'][$opt] = ['answer' => $question['option'][$opt],'answer_id' => $opt+1];
@@ -102,6 +108,8 @@ class Gohar_e_Hikmat_Questions{
               
             }
 
+            // print_r($_tmp_gh_question);
+            // die;
          
             update_post_meta($post_id, 'gohar_e_hikmat_questions',  $_tmp_gh_question  );
             update_post_meta($post_id, 'gh_release',  $_POST['gh_release']  );
