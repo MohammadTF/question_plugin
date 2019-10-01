@@ -6,7 +6,6 @@
     wp_nonce_field( 'gh_question_save', 'rudr_metabox_nonce' );
     $data = get_post_meta($post->ID, 'gohar_e_hikmat_questions',true);
     $link = get_post_meta($post->ID, 'gohar_e_hikmat_pdf',true);
-    $linkroman = get_post_meta($post->ID, 'gohar_e_hikmat_pdf_roman',true);
     $release = get_post_meta($post->ID, 'gh_release',true);
     $answer_display = get_post_meta($post->ID, 'gh_answer_display',true);
     // $correct_answer_check = get_post_meta($post->ID, 'correct_answer_check',true);

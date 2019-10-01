@@ -59,6 +59,8 @@ class Gohar_e_Hikmat_Register {
     const reset_password              = 'gohar_e_hikmat_reset_form';
 
     const single_page                 = 'gohar_e_hikmat_single_page';
+    
+    const answer_page                 = 'gohar_e_hikmat_answer_page';
 
 
 
@@ -89,6 +91,8 @@ class Gohar_e_Hikmat_Register {
         add_shortcode( Gohar_e_Hikmat_Register::member_page_shortcode, array( $this, 'render_member_page' ) );
 
         add_shortcode( Gohar_e_Hikmat_Register::single_page, array( $this, 'render_single_page' ) );
+
+        add_shortcode( Gohar_e_Hikmat_Register::answer_page, array( $this, 'render_answer_page' ) );
 
 
 
@@ -288,6 +292,75 @@ class Gohar_e_Hikmat_Register {
 
     }
 
+    public function render_answer_page()
+
+    {
+        
+        if(
+            isset($_GET['user_id']) && isset($_GET['topic_id'])
+            && !empty($_GET['user_id']) && !empty($_GET['topic_id'])
+            && is_numeric($_GET['user_id']) && is_numeric($_GET['topic_id'])
+         )
+         {
+            $user_id = $_GET['user_id'];
+            $post_id = $_GET['topic_id'];
+            $prev_answers   = get_user_meta($user_id,'_review_answers_'.$post_id,true);
+            $questions = get_post_meta($post_id,'gohar_e_hikmat_questions',true);
+            $prev_answers = json_decode($prev_answers,true);
+            // echo '<pre>';print_r($prev_answers);die;
+            
+            if(empty($prev_answers))
+            {
+                return 'No answer is submitted';
+            }
+             ob_start();
+             ?>
+             <table>
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th>Answer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($questions as $id => $ans)
+                    {?>
+                        <tr>
+                            <td><?php echo $ans['title']; ?></td>
+                            <?php foreach($ans['option'] as $options)
+                            {
+                                 print_r($options);
+                                 print_r($options['answer']);
+                                 print_r($options['answer_id']);
+                                 print_r($prev_answers[$id]['given_answer']);
+                                 print_r($id);
+                                  die;
+                                if($options['answer_id'] == $prev_answers[$id]['given_answer'])
+                                {
+
+                                    ?>
+                                        <td><?php echo $options['answer']; ?></td>
+                                    <?php 
+                                }
+                            }
+                            ?>
+                        </tr>
+                    <?php 
+                    }?>
+                </tbody>
+             </table>
+             <?php
+     
+             $html = ob_get_contents();
+     
+             ob_end_clean();
+     
+         
+     
+             return $html;
+         }
+
+    }
 
 
     public function render_single_page()
@@ -531,8 +604,17 @@ class Gohar_e_Hikmat_Register {
                                 
 
                                 })(jQuery);
+
+                                function alertbox(){
+                                    var response = confirm('Press ok, if you have marked all answers, otherwise press cancel');
+                                    if($response){
+                                      	return true;
+                                      } else {
+                                          return false;
+                                      }
+                                }
                                   </script>
-                    <form action="" method="post">
+                    <form action="" method="post" onsubmit="return confirm('Press ok, if you have marked all answers, otherwise press cancel');">
                                 <input type="hidden" name="nonce" id="nonce" value="<?php echo $nonce;?>">
                     <?php if($link): ?>
 
@@ -823,6 +905,8 @@ class Gohar_e_Hikmat_Register {
 
                                 <th>Score</th>
 
+                                <th>Answers</th>
+
                             </tr>
 
                         </thead>
@@ -885,6 +969,8 @@ class Gohar_e_Hikmat_Register {
                                 <td> <?php echo $topic_title; ?></td>
 
                                 <td> <?php echo $score; ?></td>
+                                
+                                <td> <a href="<?php echo site_url().'/answer-page?user_id='.$user->data->ID.'&topic_id='.$topic_id; ?>">View</a></td>
 
                             </tr>
 
@@ -2423,6 +2509,13 @@ class Gohar_e_Hikmat_Register {
                 'title' => __( 'Question / Answers', 'personalize-login' ),
 
                 'content' => '['.Gohar_e_Hikmat_Register::single_page.']' //custom-password-reset-form
+
+            ),
+            'answer-page' => array(
+
+                'title' => __( 'Answers', 'personalize-login' ),
+
+                'content' => '['.Gohar_e_Hikmat_Register::answer_page.']' //custom-password-reset-form
 
             )
 
