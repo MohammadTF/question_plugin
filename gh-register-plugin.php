@@ -302,11 +302,11 @@ class Gohar_e_Hikmat_Register {
             && is_numeric($_GET['user_id']) && is_numeric($_GET['topic_id'])
          )
          {
-            $user_id = $_GET['user_id'];
-            $post_id = $_GET['topic_id'];
+            $user_id        = $_GET['user_id'];
+            $post_id        = $_GET['topic_id'];
             $prev_answers   = get_user_meta($user_id,'_review_answers_'.$post_id,true);
-            $questions = get_post_meta($post_id,'gohar_e_hikmat_questions',true);
-            $prev_answers = json_decode($prev_answers,true);
+            $questions      = get_post_meta($post_id,'gohar_e_hikmat_questions',true);
+            $prev_answers   = json_decode($prev_answers,true);
             // echo '<pre>';print_r($prev_answers);die;
             
             if(empty($prev_answers))
@@ -329,17 +329,14 @@ class Gohar_e_Hikmat_Register {
                             <td><?php echo $ans['title']; ?></td>
                             <?php foreach($ans['option'] as $options)
                             {
-                                 print_r($options);
-                                 print_r($options['answer']);
-                                 print_r($options['answer_id']);
-                                 print_r($prev_answers[$id]['given_answer']);
-                                 print_r($id);
-                                  die;
                                 if($options['answer_id'] == $prev_answers[$id]['given_answer'])
                                 {
 
                                     ?>
-                                        <td><?php echo $options['answer']; ?></td>
+                                        <td>
+                                            <?php echo $options['answer']; ?>
+                                            <small>(<?php echo $ans['correct_answer']['answer_id'] == $prev_answers[$id]['given_answer']?'Correct Answer':'Wrong Answer'; ?>)</small>
+                                        </td>
                                     <?php 
                                 }
                             }
@@ -925,6 +922,7 @@ class Gohar_e_Hikmat_Register {
                         $score = 0;
 
                        
+                       
                         if(null != $submitted)
                         {
                             foreach($submitted as $ques => $ans)
@@ -932,13 +930,12 @@ class Gohar_e_Hikmat_Register {
 
                                 foreach($questions as  $question_id_ =>$question_data)
                                 {
-
-                                    $_TMP = $ans;
+                                  
 
                                     if($ques === $question_id_  )
                                     {
                                         // $given_answers[$question_data['title']] =  $_TMP;
-                                        if($_TMP['correct_answer']['answer_id'] == $question_data['correct_answer']['answer_id'])
+                                        if($ans['given_answer'] == $question_data['correct_answer']['answer_id'])
 
                                         {
                                             ++$score;
