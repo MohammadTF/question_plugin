@@ -113,6 +113,7 @@ class Gohar_e_Hikmat_Questions{
          
             update_post_meta($post_id, 'gohar_e_hikmat_questions',  $_tmp_gh_question  );
             update_post_meta($post_id, 'gh_release',  $_POST['gh_release']  );
+            update_post_meta($post_id, 'gh_end',  $_POST['gh_end']  );
             update_post_meta($post_id, 'gh_answer_display',  $_POST['gh_answer_display']  );
             
             if( ! empty( $_FILES ) && isset( $_FILES['gh_pdf'] ) ) {

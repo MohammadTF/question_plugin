@@ -7,6 +7,7 @@
     $data = get_post_meta($post->ID, 'gohar_e_hikmat_questions',true);
     $link = get_post_meta($post->ID, 'gohar_e_hikmat_pdf',true);
     $release = get_post_meta($post->ID, 'gh_release',true);
+    $enddate = get_post_meta($post->ID, 'gh_end',true);
     $answer_display = get_post_meta($post->ID, 'gh_answer_display',true);
     // $correct_answer_check = get_post_meta($post->ID, 'correct_answer_check',true);
 ?>
@@ -25,6 +26,11 @@
     <div>
             <label for="release">Release Date:</label>
             <input type="date" name="gh_release" value="<?php echo $release;?>" id="release">
+            
+        </div>
+        <div>
+            <label for="enddate">End Date:</label>
+            <input type="date" name="gh_end" value="<?php echo $enddate;?>" id="enddate">
             
         </div>
 

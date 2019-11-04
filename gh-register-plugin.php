@@ -435,13 +435,13 @@ class Gohar_e_Hikmat_Register {
             
 
 
-
+            var_dump(is_user_logged_in());
             if(is_user_logged_in()){
 
                 
                 $user_id = get_current_user_id();
 
-
+                var_dump(['user_id'=> $user_id,'post_id'=>$_POST['post_id']]);
 
 
 
@@ -490,15 +490,14 @@ class Gohar_e_Hikmat_Register {
             $submitted_answers = [];
 
             $score = 0;
-
             if(is_user_logged_in()){
-
+                
                 $user_id        = get_current_user_id();
 
                 
-                $score          = get_user_meta($user_id,'_score_'.$_POST['post_id'],true);
+                $score          = get_user_meta($user_id,'_score_'.$_GET['question_id'],true);
                 
-                $prev_answers   = get_user_meta($user_id,'_review_answers_'.$_POST['post_id'],true);
+                $prev_answers   = get_user_meta($user_id,'_review_answers_'.$_GET['question_id'],true);
                 $prev_answers = json_decode($prev_answers,true);
 
               
@@ -506,11 +505,9 @@ class Gohar_e_Hikmat_Register {
                 $save_answer = json_decode($save_answer,true);
                 
                
-                // var_dump( $save_answer  );die;
                 log::info($prev_answers);
 
             }
-
             if(!empty($prev_answers)){
 
                 echo '<p>You have successfully submitted gohar e hikmat form, please wait for the result date</p>';
@@ -529,7 +526,7 @@ class Gohar_e_Hikmat_Register {
 
                 $link = get_post_meta($question_id, 'gohar_e_hikmat_pdf',true);
                 $link_roman = get_post_meta($question_id, 'gohar_e_hikmat_pdf_roman',true);
-
+               
                 $args = [
 
                     "posts__in" => [$question_id],
@@ -631,6 +628,7 @@ class Gohar_e_Hikmat_Register {
                         $query->the_post();
 
                         $id = get_the_ID();
+                        if($id != $question_id) continue;
 
                         $display_answer = get_post_meta($id, 'gh_answer_display',true);
 
@@ -645,6 +643,8 @@ class Gohar_e_Hikmat_Register {
                     
 
                         //echo 'Score: '.$score;
+
+                        // var_dump($prev_answers);
 
                         if(false)
 
@@ -1002,6 +1002,7 @@ class Gohar_e_Hikmat_Register {
                 "post_type" =>"gohar_e_hikmat",
 
                 'meta_query'  => array(
+                    'relation' => 'AND',
 
                     array(          
 
@@ -1013,7 +1014,19 @@ class Gohar_e_Hikmat_Register {
 
                         'type'     => 'DATETIME'
 
+                    ),
+                    array(          
+
+                        'key'      => 'gh_end',
+
+                        'compare'  => '>',
+
+                        'value'    => date('Y-m-d H:i:s') ,
+
+                        'type'     => 'DATETIME'
+
                         )
+
 
                 ),
 
@@ -1041,6 +1054,8 @@ class Gohar_e_Hikmat_Register {
 
                 wp_reset_postdata();
 
+            } else {
+                echo "No Gohar e Hikmat Edition is available";
             }
 
         }
