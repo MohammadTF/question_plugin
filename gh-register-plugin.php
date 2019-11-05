@@ -149,9 +149,40 @@ class Gohar_e_Hikmat_Register {
         add_action( 'wp_enqueue_scripts', array($this,'my_enqueue') );
         add_action("wp_ajax_save_answer", array($this,"save_answer"));
         
-
+        add_action( 'show_user_profile', array($this,'extra_user_profile_fields' ));
+        add_action( 'edit_user_profile', array($this,'extra_user_profile_fields' ));
+        // add_action( 'personal_options_update', array($this,'save_extra_user_profile_fields') );
+        // add_action( 'edit_user_profile_update', array($this,'save_extra_user_profile_fields') );
     }
 
+    function save_extra_user_profile_fields( $user_id ) {
+        if ( !current_user_can( 'edit_user', $user_id ) ) { 
+            return false; 
+        }
+        // update_user_meta( $user_id, 'address', $_POST['address'] );
+        // update_user_meta( $user_id, 'postalcode', $_POST['postalcode'] );
+    }
+    function extra_user_profile_fields( $user ) { ?>
+        <h3><?php _e("Extra profile information", "blank"); ?></h3>
+    
+        <table class="form-table">
+        <tr>
+            <th><label for="telephone"><?php _e("Telephone"); ?></label></th>
+            <td>
+                <?php echo esc_attr( get_the_author_meta( 'telephone', $user->ID ) ); ?><br />
+                <!-- <span class="description"><?php _e("Please enter your address."); ?></span> -->
+            </td>
+        </tr>
+       
+        <tr>
+        <th><label for="date_of_birth"><?php _e("Date of birth"); ?></label></th>
+            <td>
+                <?php echo esc_attr( get_the_author_meta( 'date_of_birth', $user->ID ) ); ?><br />
+                <!-- <span class="description"><?php _e("Please enter your postal code."); ?></span> -->
+            </td>
+        </tr>
+        </table>
+    <?php }
     function my_enqueue() {
 
         wp_localize_script( 'my_voter_script', 'myAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));        
@@ -895,6 +926,8 @@ class Gohar_e_Hikmat_Register {
                             <tr>
 
                                 <th>Email</th>
+                                
+                                <th>Phone</th>
 
                                 <th>Name</th>
 
@@ -959,7 +992,9 @@ class Gohar_e_Hikmat_Register {
 
                             <tr>
 
-                                <td> <?php echo $user->data->user_email; ?></td>
+                                <td><?php echo $user->data->user_email; ?></td>
+                                
+                                <td> <?php echo get_user_meta($user->data->ID,'telephone',true); ?></td>
 
                                 <td> <?php echo $user->data->display_name; ?></td>
 
