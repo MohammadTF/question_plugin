@@ -928,6 +928,7 @@ class Gohar_e_Hikmat_Register {
                                 <th>Email</th>
                                 
                                 <th>Phone</th>
+                                <th>Date of birth</th>
 
                                 <th>Name</th>
 
@@ -995,6 +996,7 @@ class Gohar_e_Hikmat_Register {
                                 <td><?php echo $user->data->user_email; ?></td>
                                 
                                 <td> <?php echo get_user_meta($user->data->ID,'telephone',true); ?></td>
+                                <td> <?php echo get_user_meta($user->data->ID,'date_of_birth',true); ?></td>
 
                                 <td> <?php echo $user->data->display_name; ?></td>
 
